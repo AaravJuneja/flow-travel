@@ -1,0 +1,10 @@
+.heading { margin-bottom: 27px; }
+.searchForm { display: grid; gap: 22px; padding: clamp(20px, 4.2vw, 34px); }
+.submitRow { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 2px; }
+.submitRow p { max-width: 310px; margin: 0; color: #79868a; font-size: 0.75rem; line-height: 1.45; }
+
+@media (max-width: 560px) {
+  .searchForm { gap: 18px; padding: 19px; }
+  .submitRow { align-items: stretch; flex-direction: column; }
+  .submitRow .buttonPrimary { width: 100%; }
+}

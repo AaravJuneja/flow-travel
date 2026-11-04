@@ -1,0 +1,32 @@
+.heading { margin-bottom: 22px; }
+.walletList { display: grid; gap: 14px; margin-top: 22px; }
+.walletCard { overflow: hidden; }
+.walletCardTop { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 23px; border-bottom: 1px solid #e7ebe4; }
+.referenceLabel { margin: 0 0 4px; color: #77868a; font-size: 0.62rem; font-weight: 750; letter-spacing: 0.07em; }
+.referenceCode { margin: 0; color: var(--flow-ink); font-size: 0.91rem; font-weight: 760; letter-spacing: 0.05em; }
+.routeTitle { display: grid; grid-template-columns: 1fr 44px 1fr; align-items: center; gap: 12px; padding: 24px 23px 20px; }
+.routeTitle h2 { margin: 0; font-size: clamp(1.1rem, 3vw, 1.55rem); font-weight: 660; letter-spacing: -0.045em; }
+.routeTitle h2:last-child { text-align: right; }
+.routeTitle > span { height: 1px; background: #a6c5b6; }
+.walletFacts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; padding: 0 23px 23px; }
+.walletFacts p { min-width: 0; display: grid; gap: 5px; margin: 0; }
+.walletFacts span { color: #75848a; font-size: 0.7rem; }
+.walletFacts strong { color: #2b4147; font-size: 0.79rem; font-weight: 690; overflow-wrap: anywhere; }
+.cardActions { display: flex; justify-content: end; padding: 14px 23px; border-top: 1px solid #e7ebe4; }
+.emptyState { margin-top: 22px; padding: 35px; text-align: center; }
+.emptyState h2 { margin: 0; font-size: 1.2rem; letter-spacing: -0.035em; }
+.emptyState p { margin: 8px auto 18px; color: var(--flow-muted); font-size: 0.88rem; }
+
+@media (max-width: 680px) {
+  .walletFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 17px; }
+  .walletCardTop { padding: 17px; }
+  .routeTitle { padding-inline: 17px; }
+  .walletFacts { padding-inline: 17px; }
+  .cardActions { padding-inline: 17px; }
+}
+
+@media (max-width: 390px) {
+  .walletCardTop { align-items: start; flex-direction: column; }
+  .routeTitle { grid-template-columns: 1fr 22px 1fr; gap: 7px; }
+  .routeTitle h2 { font-size: 1.02rem; }
+}

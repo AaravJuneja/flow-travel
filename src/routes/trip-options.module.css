@@ -1,0 +1,34 @@
+.topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.step { color: #7a898d; font-size: 0.75rem; font-weight: 650; }
+.heading { margin-bottom: 22px; }
+.heading .pageHeading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.headingLine { width: clamp(30px, 5vw, 68px); height: 1px; display: inline-block; background: #8db5a7; }
+.optionGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.optionCard { min-height: 305px; display: flex; flex-direction: column; padding: 21px; }
+.optionSelected { border-color: #75aaa0; box-shadow: 0 0 0 2px rgba(22, 123, 120, 0.1); }
+.optionHeading { display: flex; align-items: center; gap: 12px; }
+.modeIcon { width: 42px; height: 42px; display: grid; flex: none; place-items: center; border-radius: 14px; background: #eaf2e9; color: #347e74; font-size: 1.15rem; }
+.optionMode { margin: 0 0 3px; color: #77868a; font-size: 0.71rem; font-weight: 650; }
+.optionHeading h2 { margin: 0; font-size: 1.02rem; font-weight: 700; letter-spacing: -0.03em; }
+.fastest { margin-left: auto; padding: 5px 8px; border-radius: 999px; background: #f8ece2; color: #a6634e; font-size: 0.63rem; font-weight: 700; }
+.optionSummary { min-height: 47px; margin: 17px 0 14px; color: var(--flow-muted); font-size: 0.82rem; line-height: 1.5; }
+.optionStats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-block: 13px; border-top: 1px solid #e7ebe4; border-bottom: 1px solid #e7ebe4; }
+.optionStats p { display: grid; gap: 4px; margin: 0; }
+.optionStats span { color: #78868a; font-size: 0.67rem; }
+.optionStats strong { color: #30484e; font-size: 0.83rem; font-weight: 700; }
+.optionPrice { display: flex; align-items: end; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 17px; }
+.optionPrice > div { display: grid; gap: 3px; }
+.optionPrice > div strong { font-size: 1.15rem; letter-spacing: -0.04em; }
+.optionPrice > div span { color: #7a898d; font-size: 0.64rem; }
+.optionPrice button { padding-inline: 12px; font-size: 0.76rem; }
+
+@media (max-width: 960px) {
+  .optionGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .optionGrid { grid-template-columns: 1fr; }
+  .optionCard { min-height: 0; }
+  .heading .pageHeading { gap: 8px; }
+  .optionSummary { min-height: 0; }
+}

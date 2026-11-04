@@ -1,0 +1,127 @@
+@import '@fontsource-variable/urbanist';
+
+:root {
+  font-family: 'Urbanist Variable', Urbanist, sans-serif;
+  color: #101926;
+  background: #ebe9e0;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --flow-ink: #101926;
+  --flow-muted: #747474;
+  --flow-teal: #ff7251;
+  --flow-coral: #ff7251;
+  --flow-canvas: #ebe9e0;
+  --flow-surface: rgba(255, 255, 255, 0.72);
+  --flow-line: #dfd9d0;
+  --flow-green-soft: #dfe8d6;
+  --flow-peach: #f4d6ca;
+  --flow-sun: #f2e8bf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 21% 8%, rgba(255, 114, 81, 0.14), transparent 31rem),
+    radial-gradient(ellipse at 83% 28%, rgba(255, 218, 149, 0.16), transparent 33rem),
+    var(--flow-canvas);
+  color: var(--flow-ink);
+  font-size: 16px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--flow-coral);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #cce3d5;
+  color: var(--flow-ink);
+}
+
+.brand {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--flow-ink);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: block;
+  flex: none;
+}
+
+.brand-name {
+  font-size: 1.55rem;
+  font-weight: 760;
+  letter-spacing: -0.075em;
+  line-height: 1;
+}
+
+.brand-byline {
+  align-self: end;
+  margin: 0 0 2px 2px;
+  color: #747474;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

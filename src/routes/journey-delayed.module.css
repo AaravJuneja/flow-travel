@@ -1,0 +1,16 @@
+.delayCard { display: grid; gap: 15px; margin-top: 23px; padding: clamp(24px, 5vw, 44px); }
+.signal { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: #f6dfd1; color: #a55f43; font-size: 1.3rem; font-weight: 800; }
+.delayEyebrow { margin: 3px 0 0; color: #a35d43; font-size: 0.77rem; font-weight: 750; }
+.delayTitle { max-width: 500px; margin: 0; font-size: clamp(2.25rem, 6vw, 3.7rem); font-weight: 660; letter-spacing: -0.075em; line-height: 0.98; }
+.delayIntro { margin: -6px 0 2px; color: var(--flow-muted); font-size: 0.91rem; }
+.delayDetail { display: flex; align-items: center; gap: 18px; padding: 19px 0; border-top: 1px solid #e6e9e2; border-bottom: 1px solid #e6e9e2; }
+.delayDuration { display: flex; align-items: baseline; gap: 3px; color: #a55f43; font-size: 2.35rem; font-weight: 720; letter-spacing: -0.06em; }
+.delayDuration small { font-size: 0.83rem; font-weight: 700; letter-spacing: 0; }
+.delayDetail h2 { margin: 0; color: var(--flow-ink); font-size: 1rem; font-weight: 700; }
+.delayDetail p { margin: 4px 0 0; color: #78868a; font-size: 0.77rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 3px; }
+
+@media (max-width: 460px) {
+  .actions { flex-direction: column; }
+  .actions > * { width: 100%; }
+}

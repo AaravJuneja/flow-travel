@@ -1,0 +1,330 @@
+.appPage {
+  min-height: 100svh;
+  background:
+    radial-gradient(ellipse at 18% 9%, rgba(255, 114, 81, 0.13), transparent 32rem),
+    radial-gradient(ellipse at 84% 18%, rgba(255, 221, 153, 0.17), transparent 36rem),
+    var(--flow-canvas);
+}
+
+.appFrame {
+  width: min(100%, 1440px);
+  min-height: 100svh;
+  margin-inline: auto;
+  padding: 0 clamp(20px, 4.7vw, 72px);
+  display: flex;
+  flex-direction: column;
+}
+
+.appHeader {
+  min-height: 84px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid rgba(16, 25, 38, 0.1);
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.5vw, 36px);
+}
+
+.desktopNav a {
+  position: relative;
+  padding-block: 10px;
+  color: #66686a;
+  font-size: 0.88rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.navActive,
+.desktopNav a:hover { color: var(--flow-ink) !important; }
+
+.navActive::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--flow-teal);
+  content: '';
+}
+
+.accountArea {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.accountName {
+  color: #696a6a;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.signOutButton {
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: #696a6a;
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.signOutButton:hover { color: var(--flow-ink); }
+.signOutButton:disabled { opacity: 0.6; cursor: progress; }
+
+.appMain {
+  width: 100%;
+  flex: 1;
+  padding-block: clamp(30px, 5vw, 68px) 72px;
+}
+
+.mobileNav { display: none; }
+
+.contentWrap {
+  width: min(100%, 1060px);
+  margin-inline: auto;
+}
+
+.narrowWrap {
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+
+.pageHeading {
+  margin: 0;
+  color: var(--flow-ink);
+  font-size: clamp(2.2rem, 4.4vw, 4rem);
+  font-weight: 650;
+  letter-spacing: -0.07em;
+  line-height: 1.02;
+}
+
+.pageIntro {
+  max-width: 590px;
+  margin: 13px 0 0;
+  color: var(--flow-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.eyebrow {
+  margin: 0 0 13px;
+  color: var(--flow-teal);
+  font-size: 0.76rem;
+  font-weight: 720;
+  letter-spacing: 0.02em;
+}
+
+.sectionHeading {
+  margin: 0;
+  color: var(--flow-ink);
+  font-size: 1.2rem;
+  font-weight: 680;
+  letter-spacing: -0.035em;
+}
+
+.sectionIntro {
+  margin: 7px 0 0;
+  color: var(--flow-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 30px rgba(93, 83, 72, 0.13);
+  backdrop-filter: blur(18px);
+}
+
+.buttonPrimary,
+.buttonSecondary,
+.buttonLink {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 19px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.87rem;
+  font-weight: 680;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.buttonPrimary {
+  background: var(--flow-coral);
+  color: white;
+}
+
+.buttonPrimary:hover { transform: translateY(-1px); background: #f46546; }
+
+.buttonSecondary {
+  border-color: rgba(255, 114, 81, 0.68);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--flow-ink);
+}
+
+.buttonSecondary:hover { border-color: var(--flow-coral); background: #fff8f4; }
+
+.buttonLink {
+  min-height: unset;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: #e96548;
+}
+
+.buttonPrimary:disabled,
+.buttonSecondary:disabled { opacity: 0.55; cursor: progress; transform: none; }
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.field {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.fieldWide { grid-column: 1 / -1; }
+
+.fieldLabel {
+  color: #53666c;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.fieldControl {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid #ded8d0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--flow-ink);
+  font-size: 0.9rem;
+}
+
+.fieldControl:hover { border-color: #f1a28e; }
+.fieldControl:focus { border-color: var(--flow-coral); outline: 3px solid rgba(255, 114, 81, 0.16); outline-offset: 0; }
+.fieldHint { margin: 0; color: #79878a; font-size: 0.73rem; line-height: 1.4; }
+
+.notice,
+.errorNotice {
+  padding: 13px 15px;
+  border: 1px solid #d6e0ce;
+  border-radius: 12px;
+  background: #edf2e7;
+  color: #4f6448;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.errorNotice {
+  border-color: #eebbad;
+  background: #fff0e9;
+  color: #984a38;
+}
+
+.statusPill {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f6e8c8;
+  color: #48545a;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.statusDot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.statusDelayed { background: #ffe2d8; color: #a84e38; }
+.statusCompleted { background: #dfe8d6; color: #386b28; }
+
+.authPage {
+  min-height: 100svh;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 28% 12%, rgba(255, 114, 81, 0.16), transparent 28rem),
+    radial-gradient(ellipse at 83% 32%, rgba(255, 219, 145, 0.19), transparent 35rem),
+    var(--flow-canvas);
+}
+
+.authCard {
+  width: min(100%, 470px);
+  padding: clamp(26px, 6vw, 46px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 24px 58px rgba(93, 83, 72, 0.14);
+  backdrop-filter: blur(20px);
+}
+
+.authBrand { margin-bottom: 36px; }
+.authTitle { margin: 0; font-size: 2.25rem; font-weight: 660; letter-spacing: -0.07em; }
+.authCopy { margin: 8px 0 27px; color: var(--flow-muted); font-size: 0.91rem; line-height: 1.5; }
+.authForm { display: grid; gap: 17px; }
+.authSubmit { width: 100%; margin-top: 4px; }
+.authSwitch { margin: 22px 0 0; color: var(--flow-muted); text-align: center; font-size: 0.83rem; }
+.authSwitch a { color: var(--flow-teal); font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+@media (max-width: 760px) {
+  .appFrame { padding-inline: clamp(16px, 5vw, 24px); }
+  .appHeader { min-height: 0; padding-block: 17px 12px; grid-template-columns: 1fr auto; row-gap: 15px; }
+  .desktopNav { display: none; }
+  .accountArea { gap: 10px; }
+  .accountName { display: none; }
+  .appMain { padding-block: 25px 48px; }
+  .mobileNav {
+    grid-column: 1 / -1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.48);
+  }
+  .mobileNav a {
+    min-height: 37px;
+    min-width: 0;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-radius: 999px;
+    color: #6d6d6d;
+    font-size: 0.75rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .mobileNav .mobileNavActive { background: #ff7251; color: white; }
+}
+
+@media (max-width: 520px) {
+  .formGrid { grid-template-columns: 1fr; gap: 15px; }
+  .fieldWide { grid-column: auto; }
+  .pageHeading { font-size: clamp(2rem, 10vw, 3rem); }
+  .panel { border-radius: 19px; }
+}

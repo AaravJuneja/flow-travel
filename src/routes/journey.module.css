@@ -1,0 +1,61 @@
+.topline { display: flex; justify-content: space-between; margin-bottom: 18px; }
+.journeyHero { min-height: 260px; display: grid; grid-template-columns: 1fr 0.82fr; align-items: center; gap: 30px; padding: clamp(24px, 5vw, 48px); overflow: hidden; }
+.journeyIntro { max-width: 570px; }
+.journeyIntro .pageHeading { font-size: clamp(2.1rem, 4vw, 3.5rem); }
+.journeyIntro .pageIntro { margin-bottom: 17px; }
+.progressVisual { position: relative; min-height: 170px; display: grid; align-content: center; justify-items: center; border-radius: 18px; background-color: #eaf1e8; background-image: repeating-linear-gradient(155deg, transparent 0 35px, rgba(63, 117, 98, 0.09) 36px 37px, transparent 38px 65px); }
+.progressVisual > p { margin: 15px 0 0; color: #637a74; font-size: 0.72rem; font-weight: 700; }
+.routeArtwork { position: relative; width: 76%; height: 48px; }
+.routePath { position: absolute; top: 23px; left: 8px; right: 8px; height: 2px; background: repeating-linear-gradient(90deg, #197d79 0 7px, transparent 7px 13px); }
+.routeStart,
+.routeMiddle,
+.routeEnd { position: absolute; z-index: 1; top: 17px; width: 14px; height: 14px; border: 3px solid #fffefa; border-radius: 50%; background: #167b78; box-shadow: 0 0 0 1px #91b9a8; }
+.routeStart { left: 0; }
+.routeMiddle { left: 50%; background: #e07a60; }
+.routeEnd { right: 0; }
+.journeyGrid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr); gap: 15px; margin-top: 17px; align-items: start; }
+.timelinePanel { padding: clamp(20px, 3.5vw, 30px); }
+.panelHeading { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.panelHeading > a { white-space: nowrap; }
+.timeline { display: grid; }
+.timelineStep { position: relative; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 13px; padding-bottom: 23px; }
+.timelineStep:not(:last-child)::before { position: absolute; top: 29px; bottom: 0; left: 13px; border-left: 1px dashed #a6c3b6; content: ''; }
+.timelineMarker { position: relative; z-index: 1; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid #bed0c4; border-radius: 50%; background: #f3f7f0; color: #4a796d; font-size: 0.7rem; font-weight: 760; }
+.currentStep .timelineMarker { border-color: var(--flow-teal); background: var(--flow-teal); color: white; box-shadow: 0 0 0 4px #e1eee5; }
+.timelineContent { min-width: 0; padding-top: 2px; }
+.timelineTop { display: flex; justify-content: space-between; gap: 12px; }
+.timelineTop p { margin: 0 0 3px; color: #74837f; font-size: 0.7rem; font-weight: 650; }
+.timelineTop h3 { margin: 0; font-size: 0.93rem; font-weight: 700; letter-spacing: -0.02em; }
+.timelineTop > span { color: #77868a; font-size: 0.72rem; white-space: nowrap; }
+.segmentNote { margin: 8px 0 0; color: #62746f; font-size: 0.78rem; }
+.stepStatus { display: inline-block; margin-top: 8px; color: var(--flow-teal); font-size: 0.68rem; font-weight: 750; }
+.journeyActions { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 5px; }
+.delayForm { display: grid; gap: 16px; margin-top: 18px; padding: 17px; border-radius: 14px; background: #f0f4ed; }
+.delayForm h3 { margin: 0; font-size: 0.93rem; }
+.delayFields { display: grid; grid-template-columns: 0.6fr 1fr; gap: 12px; }
+.sideColumn { display: grid; gap: 14px; }
+.nextCard,
+.updatesCard { padding: 21px; }
+.nextCard h2 { margin: 7px 0; font-size: 1.22rem; font-weight: 690; letter-spacing: -0.04em; }
+.nextCard > p:last-child { margin: 0; color: var(--flow-muted); font-size: 0.82rem; line-height: 1.5; }
+.updatesCard > h2 { margin-bottom: 8px; }
+.manualNote { margin: 0; color: #728188; font-size: 0.75rem; line-height: 1.5; }
+.eventList { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.eventList li { display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid #e5eae2; color: #475d62; font-size: 0.75rem; line-height: 1.4; }
+.eventList time { flex: none; color: #879397; font-size: 0.66rem; }
+.emptyUpdates { margin: 15px 0 0; color: #839095; font-size: 0.75rem; }
+
+@media (max-width: 900px) {
+  .journeyHero { grid-template-columns: 1fr; }
+  .progressVisual { min-height: 130px; }
+  .journeyGrid { grid-template-columns: 1fr; }
+  .sideColumn { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 620px) {
+  .journeyHero { padding: 23px 19px; }
+  .sideColumn { grid-template-columns: 1fr; }
+  .timelinePanel { padding: 19px 15px; }
+  .timelineTop { flex-direction: column; gap: 5px; }
+  .delayFields { grid-template-columns: 1fr; }
+}
