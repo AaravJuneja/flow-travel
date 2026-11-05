@@ -1,5 +1,6 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import { PendingFeedback } from '../components/FlowLoader'
 
 import appCss from '../styles.css?url'
 
@@ -34,8 +35,18 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  component: RootComponent,
   errorComponent: RootError,
 })
+
+function RootComponent() {
+  return (
+    <>
+      <Outlet />
+      <PendingFeedback />
+    </>
+  )
+}
 
 function RootError() {
   return (

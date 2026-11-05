@@ -4,6 +4,7 @@ import AppLayout from '../components/AppLayout'
 import { TriangleAlert } from 'lucide-react'
 import { getCurrentUser, getTripDetails, resolveJourneyDelay } from '../server/functions'
 import app from '../styles/app.module.css'
+import FlowLoader from '../components/FlowLoader'
 import styles from './journey-delayed.module.css'
 
 export const Route = createFileRoute('/journey/$tripId/delayed')({
@@ -81,7 +82,8 @@ function DelayPage() {
             {!data.segments.length && <p className={styles.emptyTimeline}>No journey steps have been added yet.</p>}
             {error && <p className={app.errorNotice} role="alert">{error}</p>}
             <div className={styles.actions}>
-              <button className={app.buttonPrimary} type="button" disabled={busy} onClick={() => void resolve()}>
+              <button className={app.buttonPrimary} type="button" disabled={busy} data-pending={busy || undefined} onClick={() => void resolve()}>
+                {busy && <FlowLoader />}
                 {busy ? 'Saving update' : 'Mark as resolved'}
               </button>
               <Link className={app.buttonSecondary} to="/journey/$tripId" params={{ tripId: data.trip.id }}>View updated journey</Link>

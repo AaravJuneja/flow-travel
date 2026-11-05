@@ -4,6 +4,7 @@ import AppLayout from '../components/AppLayout'
 import { CalendarDays } from 'lucide-react'
 import { chooseTripOption, getCurrentUser, getTripOptions } from '../server/functions'
 import app from '../styles/app.module.css'
+import FlowLoader from '../components/FlowLoader'
 import styles from './trip-options.module.css'
 
 export const Route = createFileRoute('/trip/$tripId/options')({
@@ -140,7 +141,8 @@ function RouteOptionsPage() {
             )}
 
             <div className={styles.actionArea}>
-              <button className={app.buttonPrimary} type="button" disabled={busy || !activeOption} onClick={() => void select()}>
+              <button className={app.buttonPrimary} type="button" disabled={busy || !activeOption} data-pending={busy || undefined} onClick={() => void select()}>
+                {busy && <FlowLoader />}
                 {busy ? 'Saving route' : trip.selectedOptionId === activeOption?.id ? 'Keep this route' : 'Choose this route'}
               </button>
               <p>Review the route before starting your journey.</p>

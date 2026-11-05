@@ -2,6 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useState, type FormEvent } from 'react'
 import { registerAccount, signIn } from '../server/functions'
 import styles from '../styles/app.module.css'
+import FlowLoader from './FlowLoader'
 
 type Props = { mode: 'create' | 'signIn' }
 
@@ -69,7 +70,8 @@ export default function AuthForm({ mode }: Props) {
 
           {error && <p className={styles.errorNotice} role="alert">{error}</p>}
 
-          <button className={`${styles.buttonPrimary} ${styles.authSubmit}`} type="submit" disabled={busy}>
+          <button className={`${styles.buttonPrimary} ${styles.authSubmit}`} type="submit" disabled={busy} data-pending={busy || undefined}>
+            {busy && <FlowLoader />}
             {busy ? 'Please wait' : isCreate ? 'Create account' : 'Sign in'}
           </button>
         </form>

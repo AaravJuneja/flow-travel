@@ -1,0 +1,73 @@
+.loader {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  inline-size: var(--flow-loader-size, 1.15em);
+  block-size: var(--flow-loader-size, 1.15em);
+  overflow: hidden;
+  vertical-align: -0.2em;
+  -webkit-mask: url('/assets/flow-mark.svg') center / contain no-repeat;
+  mask: url('/assets/flow-mark.svg') center / contain no-repeat;
+}
+
+.loader::before,
+.loader::after {
+  content: '';
+  position: absolute;
+}
+
+.loader::before {
+  inset: 0;
+  background: currentColor;
+  opacity: 0.32;
+}
+
+.loader::after {
+  inset: -50%;
+  background: linear-gradient(45deg, transparent 38%, currentColor 50%, transparent 62%);
+  transform: translate(-45%, 45%);
+  animation: flow-current 1.3s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+
+.pagePending {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 30px rgba(16, 25, 38, 0.12);
+  color: var(--flow-coral);
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: pending-in 180ms ease-out both;
+  --flow-loader-size: 22px;
+}
+
+.pagePending[hidden] {
+  display: none;
+}
+
+@keyframes flow-current {
+  to { transform: translate(45%, -45%); }
+}
+
+@keyframes pending-in {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader::before { opacity: 1; }
+  .loader::after { display: none; animation: none; }
+  .pagePending { animation: none; }
+}
+
+@media (forced-colors: active) {
+  .loader { forced-color-adjust: none; }
+  .loader::before { background: CanvasText; opacity: 1; }
+  .loader::after { display: none; }
+  .pagePending { border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
+}

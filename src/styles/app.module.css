@@ -68,6 +68,9 @@
 }
 
 .signOutButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 0;
   border: 0;
   background: none;

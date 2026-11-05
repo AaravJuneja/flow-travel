@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { setAccountPassword, signOut } from '../server/functions'
 import styles from '../styles/app.module.css'
 import Brand from './Brand'
+import FlowLoader from './FlowLoader'
 
 type Props = {
   children: React.ReactNode
@@ -68,7 +69,8 @@ export default function AppLayout({ children, name, active = 'home', mobileHeade
           </nav>
           <div className={styles.accountArea}>
             {name && <button type="button" className={styles.accountName} aria-label="Your account" onClick={() => setAccountOpen(true)}>Hi, {name.trim().split(/\s+/u)[0]}</button>}
-            <button type="button" className={styles.signOutButton} onClick={handleSignOut} disabled={signingOut}>
+            <button type="button" className={styles.signOutButton} onClick={handleSignOut} disabled={signingOut} data-pending={signingOut || undefined}>
+              {signingOut && <FlowLoader />}
               {signingOut ? 'Signing out' : 'Sign out'}
             </button>
           </div>
@@ -90,9 +92,9 @@ export default function AppLayout({ children, name, active = 'home', mobileHeade
             </label>
             {passwordError && <p className={styles.errorNotice} role="alert">{passwordError}</p>}
             {passwordSaved && <p className={styles.notice} role="status">Password saved.</p>}
-            <button className={styles.buttonPrimary} type="submit" disabled={savingPassword}>{savingPassword ? 'Saving password' : 'Save password'}</button>
+            <button className={styles.buttonPrimary} type="submit" disabled={savingPassword} data-pending={savingPassword || undefined}>{savingPassword && <FlowLoader />}{savingPassword ? 'Saving password' : 'Save password'}</button>
           </form>
-          <button type="button" className={styles.buttonLink} onClick={handleSignOut} disabled={signingOut}>{signingOut ? 'Signing out' : 'Sign out'}</button>
+          <button type="button" className={styles.buttonLink} onClick={handleSignOut} disabled={signingOut} data-pending={signingOut || undefined}>{signingOut && <FlowLoader />}{signingOut ? 'Signing out' : 'Sign out'}</button>
         </dialog>
         <main className={styles.appMain}>{children}</main>
       </div>

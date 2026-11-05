@@ -1,10 +1,11 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AppLayout from '../components/AppLayout'
 import TripStatusIcon from '../components/TripStatusIcon'
 import { CalendarDays, Check, Clock3 } from 'lucide-react'
 import { createCheckoutSession, getCurrentUser, getWalletData } from '../server/functions'
 import app from '../styles/app.module.css'
+import FlowLoader from '../components/FlowLoader'
 import styles from './wallet.module.css'
 
 export const Route = createFileRoute('/wallet')({
@@ -29,6 +30,14 @@ function WalletPage() {
   const selectedTotal = selected?.payment?.amountCents ?? (selected?.option
     ? estimatedTotal(selected.option.priceCents, selectedRoute?.priceBasis ?? 'perTraveler', selected.trip.travelers)
     : 0)
+
+  useEffect(() => {
+    const reset = (event: PageTransitionEvent) => {
+      if (event.persisted) setCheckoutTripId('')
+    }
+    window.addEventListener('pageshow', reset)
+    return () => window.removeEventListener('pageshow', reset)
+  }, [])
 
   async function openCheckout(tripId: string) {
     setCheckoutTripId(tripId)
@@ -165,8 +174,10 @@ function WalletPage() {
                           className={app.buttonPrimary}
                           type="button"
                           disabled={checkoutTripId !== ''}
+                          data-pending={checkoutTripId === trip.id || undefined}
                           onClick={() => void openCheckout(trip.id)}
                         >
+                          {checkoutTripId === trip.id && <FlowLoader />}
                           {checkoutTripId === trip.id ? 'Opening test checkout' : 'Continue to test payment'}
                         </button>
                       )}
@@ -179,7 +190,7 @@ function WalletPage() {
         )}
         {view === 'plans' && selected?.option && <>
           <section className={`${app.panel} ${styles.fareSummary}`} aria-label="Estimate total"><p><span>Route estimate</span><span>{formatMoney(selectedTotal, selected.option.currency)}</span></p><p><span>{selectedRoute?.priceBasis === 'perVehicle' ? 'Price basis' : 'Travelers'}</span><span>{selectedRoute?.priceBasis === 'perVehicle' ? 'Per vehicle' : selected.trip.travelers}</span></p><p className={styles.fareTotal}><span>Total estimate</span><strong>{formatMoney(selectedTotal, selected.option.currency)}</strong></p></section>
-          {selected.trip.status === 'planned' && selected.payment && selected.payment.status !== 'test_succeeded' && <button className={`${app.buttonPrimary} ${styles.checkoutButton}`} type="button" disabled={checkoutTripId !== ''} onClick={() => void openCheckout(selected.trip.id)}>{checkoutTripId === selected.trip.id ? 'Opening test checkout' : 'Continue to test payment'}</button>}
+          {selected.trip.status === 'planned' && selected.payment && selected.payment.status !== 'test_succeeded' && <button className={`${app.buttonPrimary} ${styles.checkoutButton}`} type="button" disabled={checkoutTripId !== ''} data-pending={checkoutTripId === selected.trip.id || undefined} onClick={() => void openCheckout(selected.trip.id)}>{checkoutTripId === selected.trip.id && <FlowLoader />}{checkoutTripId === selected.trip.id ? 'Opening test checkout' : 'Continue to test payment'}</button>}
         </>}
       </div>
     </AppLayout>

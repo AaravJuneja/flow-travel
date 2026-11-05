@@ -10,6 +10,7 @@ import {
   startJourney,
 } from '../server/functions'
 import app from '../styles/app.module.css'
+import FlowLoader from '../components/FlowLoader'
 import styles from './journey.module.css'
 
 export const Route = createFileRoute('/journey/$tripId')({
@@ -34,7 +35,8 @@ function JourneyPage() {
   const data = Route.useLoaderData()
   const router = useRouter()
   const navigate = useNavigate()
-  const [busy, setBusy] = useState(false)
+  const [pending, setPending] = useState<'' | 'progress' | 'delay'>('')
+  const busy = pending !== ''
   const [error, setError] = useState('')
   const [delayFormOpen, setDelayFormOpen] = useState(false)
   const completedCount = data.segments.filter((segment) => segment.status === 'completed').length
@@ -44,7 +46,7 @@ function JourneyPage() {
   const nextLeg = currentSegment ?? nextSegment
 
   async function updateJourney(action: () => Promise<unknown>) {
-    setBusy(true)
+    setPending('progress')
     setError('')
     try {
       await action()
@@ -52,13 +54,13 @@ function JourneyPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Your journey could not be updated.')
     } finally {
-      setBusy(false)
+      setPending('')
     }
   }
 
   async function submitDelay(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setBusy(true)
+    setPending('delay')
     setError('')
     const form = new FormData(event.currentTarget)
     try {
@@ -73,7 +75,7 @@ function JourneyPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'The delay could not be saved.')
     } finally {
-      setBusy(false)
+      setPending('')
     }
   }
 
@@ -130,13 +132,15 @@ function JourneyPage() {
             {error && <p className={app.errorNotice} role="alert">{error}</p>}
             <section className={styles.actionPanel} aria-label="Journey actions">
               {data.trip.status === 'planned' && (
-                <button className={app.buttonPrimary} type="button" disabled={busy} onClick={() => void updateJourney(() => startJourney({ data: { tripId: data.trip.id } }))}>
-                  {busy ? 'Starting journey' : 'Start my journey'}
+                <button className={app.buttonPrimary} type="button" disabled={busy} data-pending={pending === 'progress' || undefined} onClick={() => void updateJourney(() => startJourney({ data: { tripId: data.trip.id } }))}>
+                  {pending === 'progress' && <FlowLoader />}
+                  {pending === 'progress' ? 'Starting journey' : 'Start my journey'}
                 </button>
               )}
               {data.trip.status === 'active' && currentSegment && (
-                <button className={app.buttonPrimary} type="button" disabled={busy} onClick={() => void updateJourney(() => completeNextLeg({ data: { tripId: data.trip.id } }))}>
-                  {busy ? 'Saving progress' : `Mark ${currentSegment.toName} reached`}
+                <button className={app.buttonPrimary} type="button" disabled={busy} data-pending={pending === 'progress' || undefined} onClick={() => void updateJourney(() => completeNextLeg({ data: { tripId: data.trip.id } }))}>
+                  {pending === 'progress' && <FlowLoader />}
+                  {pending === 'progress' ? 'Saving progress' : `Mark ${currentSegment.toName} reached`}
                 </button>
               )}
               {data.trip.status === 'active' && !currentSegment && (
@@ -167,7 +171,7 @@ function JourneyPage() {
                     <input className={app.fieldControl} name="message" minLength={3} maxLength={240} required aria-label="Describe the travel delay" />
                   </label>
                 </div>
-                <button className={app.buttonSecondary} type="submit" disabled={busy}>{busy ? 'Saving update' : 'Save delay update'}</button>
+                <button className={app.buttonSecondary} type="submit" disabled={busy} data-pending={pending === 'delay' || undefined}>{pending === 'delay' && <FlowLoader />}{pending === 'delay' ? 'Saving update' : 'Save delay update'}</button>
               </form>
             )}
 

@@ -7,6 +7,7 @@ import { createTrip, getCurrentUser } from '../server/functions'
 import type { City } from '../server/cities'
 import styles from './trip-search.module.css'
 import app from '../styles/app.module.css'
+import FlowLoader from '../components/FlowLoader'
 
 export const Route = createFileRoute('/trip/search')({
   beforeLoad: async () => {
@@ -116,7 +117,8 @@ function TripSearchPage() {
               </details>
 
             {error && <p className={app.errorNotice} role="alert">{error}</p>}
-              <button type="submit" className={app.buttonPrimary} disabled={busy || !origin || !destination}>
+              <button type="submit" className={app.buttonPrimary} disabled={busy || !origin || !destination} data-pending={busy || undefined}>
+                {busy && <FlowLoader />}
                 {busy ? 'Velo is planning...' : 'Plan my journey'} <span aria-hidden="true">↗</span>
               </button>
             </div>

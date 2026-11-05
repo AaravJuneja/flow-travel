@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
 import { chooseTripOption, getCurrentUser, getTripDetails, updateTripPlan } from '../server/functions'
 import app from '../styles/app.module.css'
+import FlowLoader from '../components/FlowLoader'
 import styles from './trip-edit.module.css'
 
 export const Route = createFileRoute('/trip/$tripId/edit')({
@@ -22,7 +23,8 @@ export const Route = createFileRoute('/trip/$tripId/edit')({
 function EditTripPage() {
   const data = Route.useLoaderData()
   const router = useRouter()
-  const [busy, setBusy] = useState(false)
+  const [pending, setPending] = useState<'' | 'route' | 'details'>('')
+  const busy = pending !== ''
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
   const [today, setToday] = useState('')
@@ -32,7 +34,7 @@ function EditTripPage() {
   useEffect(() => setOptionId(data.trip.selectedOptionId ?? ''), [data.trip.selectedOptionId])
 
   async function changeRoute() {
-    setBusy(true)
+    setPending('route')
     setError('')
     setSaved(false)
     try {
@@ -42,13 +44,13 @@ function EditTripPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'The route could not be changed.')
     } finally {
-      setBusy(false)
+      setPending('')
     }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setBusy(true)
+    setPending('details')
     setError('')
     setSaved(false)
     const form = new FormData(event.currentTarget)
@@ -70,7 +72,7 @@ function EditTripPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Your changes could not be saved.')
     } finally {
-      setBusy(false)
+      setPending('')
     }
   }
 
@@ -138,7 +140,7 @@ function EditTripPage() {
             </div>
             {error && <p className={app.errorNotice} role="alert">{error}</p>}
             {saved && <p className={app.notice} role="status">Your route is saved.</p>}
-            <button className={`${app.buttonPrimary} ${styles.saveButton}`} type="button" disabled={busy} onClick={() => void changeRoute()}>{busy ? 'Updating route' : 'Update route'}</button>
+            <button className={`${app.buttonPrimary} ${styles.saveButton}`} type="button" disabled={busy} data-pending={pending === 'route' || undefined} onClick={() => void changeRoute()}>{pending === 'route' && <FlowLoader />}{pending === 'route' ? 'Updating route' : 'Update route'}</button>
           </section>}
 
           <details className={styles.detailsDisclosure} open={data.options.length === 1}>
@@ -207,8 +209,9 @@ function EditTripPage() {
 
             {error && <p className={app.errorNotice} role="alert">{error}</p>}
             {saved && <p className={app.notice} role="status">Your trip details are saved.</p>}
-            <button className={`${app.buttonPrimary} ${styles.saveButton}`} type="submit" disabled={busy}>
-              {busy ? 'Saving changes' : 'Save trip details'}
+            <button className={`${app.buttonPrimary} ${styles.saveButton}`} type="submit" disabled={busy} data-pending={pending === 'details' || undefined}>
+              {pending === 'details' && <FlowLoader />}
+              {pending === 'details' ? 'Saving changes' : 'Save trip details'}
             </button>
           </form>
           </details>
