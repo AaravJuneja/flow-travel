@@ -16,6 +16,7 @@ import {
 import { env as workerEnv } from 'cloudflare:workers'
 import { getDatabase } from './db'
 import { hashPassword, verifyPassword } from './passwords'
+import { deleteOwnedTrip } from './trip-management'
 import {
   itinerarySegments,
   journeyEvents,
@@ -266,6 +267,17 @@ export async function signOut() {
 
 export async function getCurrentUser() {
   return authenticatedUser()
+}
+
+export async function updateProfile(name: string) {
+  const user = await requireUser()
+  await getDatabase().update(users).set({ name }).where(eq(users.id, user.id))
+  return { saved: true }
+}
+
+export async function deleteTrip(tripId: string) {
+  const user = await requireUser()
+  return deleteOwnedTrip(getDatabase(), user.id, tripId)
 }
 
 export async function getHomeData() {

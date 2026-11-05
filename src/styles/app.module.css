@@ -58,6 +58,9 @@
 }
 
 .accountName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 0;
   border: 0;
   background: none;
@@ -96,7 +99,11 @@
 .accountPanel h2 { font-weight: 500; }
 .accountPanel p { color: #747474; line-height: 1.5; }
 .accountPassword { display: grid; gap: 14px; margin: 20px 0; }
-.accountClose { position: absolute; top: 12px; right: 16px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.7rem; cursor: pointer; }
+.accountClose { position: absolute; top: 12px; right: 16px; display: grid; place-items: center; width: 36px; height: 36px; border: 0; background: none; font-size: 1.7rem; cursor: pointer; }
+.iconButton { display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 1px solid var(--flow-line); border-radius: 50%; background: transparent; color: var(--flow-ink); cursor: pointer; }
+.iconButton:hover { background: #ff725114; border-color: var(--flow-coral); }
+.dialogActions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.dialogActions > button { flex: 1; }
 
 .contentWrap {
   width: min(100%, 1060px);

@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import AppLayout from '../components/AppLayout'
 import TripStatusIcon from '../components/TripStatusIcon'
+import DeleteTripButton from '../components/DeleteTripButton'
 import { CalendarDays, Check, Clock3 } from 'lucide-react'
 import { createCheckoutSession, getCurrentUser, getWalletData } from '../server/functions'
 import app from '../styles/app.module.css'
@@ -131,7 +132,8 @@ function WalletPage() {
                         <p className={styles.noRoute}>Choose a route estimate to add route details to this plan.</p>
                       )}
 
-                      <div className={styles.cardActions}>
+                       <div className={styles.cardActions}>
+                         <DeleteTripButton tripId={trip.id} origin={trip.originName} destination={trip.destinationName} />
                         {trip.status === 'planning' && <Link className={app.buttonSecondary} to="/trip/$tripId/options" params={{ tripId: trip.id }}>Compare routes</Link>}
                         {trip.status === 'planned' && <Link className={app.buttonSecondary} to="/trip/$tripId/edit" params={{ tripId: trip.id }}>View plan</Link>}
                         {(trip.status === 'active' || trip.status === 'delayed' || trip.status === 'completed') && <Link className={app.buttonSecondary} to="/journey/$tripId" params={{ tripId: trip.id }}>Open journey</Link>}

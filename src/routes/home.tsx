@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import AppLayout from '../components/AppLayout'
 import TripStatusIcon from '../components/TripStatusIcon'
+import DeleteTripButton from '../components/DeleteTripButton'
 import { Clock3 } from 'lucide-react'
 import { getCurrentUser, getHomeData } from '../server/functions'
 import styles from './home.module.css'
@@ -62,7 +63,7 @@ function HomePage() {
                   <span className={`${app.statusPill} ${trip.status === 'delayed' ? app.statusDelayed : trip.status === 'completed' ? app.statusCompleted : ''}`}>
                     <TripStatusIcon status={trip.status} />{statusLabel(trip.status)}
                   </span>
-                  <TripAction tripId={trip.id} status={trip.status} />
+                   <div className={styles.tripActions}><TripAction tripId={trip.id} status={trip.status} /><DeleteTripButton tripId={trip.id} origin={trip.originName} destination={trip.destinationName} /></div>
                   </div>
                 </article>
               ))}

@@ -11,6 +11,7 @@ import {
   setPasswordSchema,
   tripIdSchema,
   updatePlanSchema,
+  updateProfileSchema,
 } from './validation'
 
 export const registerAccount = createServerFn({ method: 'POST' })
@@ -43,6 +44,20 @@ export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async ()
   const service = await import('./services')
   return service.getCurrentUser()
 })
+
+export const updateProfile = createServerFn({ method: 'POST' })
+  .validator(updateProfileSchema)
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    return service.updateProfile(data.name)
+  })
+
+export const deleteTrip = createServerFn({ method: 'POST' })
+  .validator(tripIdSchema)
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    return service.deleteTrip(data.tripId)
+  })
 
 export const getHomeData = createServerFn({ method: 'GET' }).handler(async () => {
   const service = await import('./services')

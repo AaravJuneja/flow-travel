@@ -19,6 +19,7 @@ export const signInSchema = z.object({
 })
 
 export const setPasswordSchema = z.object({ password })
+export const updateProfileSchema = z.object({ name: z.string().trim().min(1, 'Enter your name.').max(80) })
 
 export const createTripSchema = z.object({
   originCode: z.string().regex(/^(IN-\d+|[A-Z]{3})$/),

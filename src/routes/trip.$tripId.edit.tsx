@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect, useRouter } from '@tanstack/react-router'
 import { useEffect, useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
+import DeleteTripButton from '../components/DeleteTripButton'
 import { chooseTripOption, getCurrentUser, getTripDetails, updateTripPlan } from '../server/functions'
 import app from '../styles/app.module.css'
 import FlowLoader from '../components/FlowLoader'
@@ -217,7 +218,7 @@ function EditTripPage() {
           </details>
 
           <footer className={styles.journeyLink}>
-            <span>Ready to go?</span>
+            <DeleteTripButton tripId={data.trip.id} origin={data.trip.originName} destination={data.trip.destinationName} returnHome />
             <Link to="/journey/$tripId" params={{ tripId: data.trip.id }}>Open journey <span aria-hidden="true">↗</span></Link>
           </footer>
         </div>
