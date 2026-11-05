@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { distanceKm, generateVeloPlan, type AiRunner } from './velo'
-import { findCity, searchCities } from './cities'
+import { findCity, matchesCityName, searchCities } from './cities'
 
 const origin = findCity('IN-1275339')!
 const destination = findCity('IN-1259229')!
@@ -62,5 +62,8 @@ describe('Velo', () => {
     expect(searchCities('London')).toEqual([])
     expect(distanceKm(origin, destination)).toBeGreaterThan(100)
     expect(findCity('IN-999999999')).toBeUndefined()
+    expect(matchesCityName(findCity('GGM')!, 'Gurgaon bus stand')).toBe(true)
+    expect(matchesCityName(origin, 'New Delhi Railway Station')).toBe(false)
+    expect(matchesCityName(searchCities('Leh')[0], 'Leh town')).toBe(true)
   })
 })

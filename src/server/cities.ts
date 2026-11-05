@@ -19,6 +19,14 @@ export function findCity(code: string): City | undefined {
   return city ? publicCity(city) : undefined
 }
 
+export function matchesCityName(city: City, place: string) {
+  const row = rows.find((row) => `IN-${row[0]}` === city.code)
+  const names = [city.name, ...String(row?.[6] ?? '').split(',')]
+  const target = normalize(place)
+  if (target.includes(normalize(city.name))) return true
+  return names.some((name) => name.length >= 4 && target.includes(normalize(name)))
+}
+
 export function searchCities(query: string) {
   const term = normalize(query.trim())
   if (term.length < 2) return []

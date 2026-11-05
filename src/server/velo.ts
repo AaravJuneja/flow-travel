@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { City } from './cities'
+import { matchesCityName } from './cities'
 import type { RouteEstimate } from './route-catalog'
 import type { TravelContext } from './travel-context'
 
@@ -37,6 +38,7 @@ Be honest:
 - For unfamiliar small towns, keep local tips general. Name attractions only when you are confident they exist. Do not claim you checked sources.
 
 Give one to three useful alternatives, not a fixed set of modes. When the request asks to compare feasible bus, cab and rail choices, include each of those choices as a separate route. A transfer does not make rail infeasible. Use the supplied connection facts. Each route is one-way from the given origin to destination, never a return trip. Legs must connect in order. The first starts at the origin and the last ends at the destination. Include last-mile travel, connection waits and transfers in the durations.
+Include the fixed origin city name in the first leg's fromName and the fixed destination city name in the final leg's toName.
 Do not assume a station is walking distance from a neighborhood. Use a local cab when the distance is unknown, and include its estimated fare. A published base fare does not include extra local cabs. A supplied combined duration is a lower bound before extra pickup and drop-off legs. Do not shorten it. Do not invent a booked hotel or assume where the traveler is staying.
 mode must be one of Train, Bus, Cab, Flight, Ferry, Walk. Use Cab for taxi or auto, Train for metro.
 durationMinutes is a positive whole number. priceRupees is INR for the entire route including transfers. For routes made only of Cab and Walk, price one vehicle with enough seats for this group, not each passenger. Above four travelers, use a larger vehicle and price it accordingly. Otherwise price exactly one traveler, even when several travel. Flow multiplies that fare by the traveler count, so do not multiply it yourself. summary explains why to pick the route and what the estimate covers. Do not put a group total in a per-person summary.
@@ -111,17 +113,20 @@ export async function generateVeloPlan(ai: AiRunner, input: { origin: City; dest
     sourceLabel: 'Velo AI estimate',
     sourceUrl: '',
   })).filter((route) => {
-    const normalizePlace = (name: string) => name.normalize('NFD').replace(/[\u0300-\u036f]/gu, '').toLowerCase()
-    if (!normalizePlace(route.legs[0].fromName).includes(normalizePlace(input.origin.name))) return false
-    if (!normalizePlace(route.legs.at(-1)!.toName).includes(normalizePlace(input.destination.name))) return false
+    const reject = (reason: string) => {
+      console.warn('Velo route validation rejected a draft', { reason, distanceKm: km, durationMinutes: route.durationMinutes, priceCents: route.priceCents })
+      return false
+    }
+    if (!matchesCityName(input.origin, route.legs[0].fromName)) return reject('origin')
+    if (!matchesCityName(input.destination, route.legs.at(-1)!.toName)) return reject('destination')
     const hasFlight = route.legs.some((leg) => leg.mode === 'Flight')
     const hasFerry = route.legs.some((leg) => leg.mode === 'Ferry')
-    if (hasFlight && km < 150) return false
-    if (hasFlight && route.priceCents < 150000) return false
-    if (seaCrossing && !hasFlight && !hasFerry) return false
-    if (!hasFlight && !hasFerry && km / (route.durationMinutes / 60) > 110) return false
-    if (route.priceBasis === 'perVehicle' && route.priceCents < km * 5 * 100) return false
-    if (route.priceBasis === 'perTraveler' && route.priceCents < km * 0.1 * 100) return false
+    if (hasFlight && km < 150) return reject('short-flight')
+    if (hasFlight && route.priceCents < 150000) return reject('flight-fare')
+    if (seaCrossing && !hasFlight && !hasFerry) return reject('sea-crossing')
+    if (!hasFlight && !hasFerry && km / (route.durationMinutes / 60) > 110) return reject('ground-duration')
+    if (route.priceBasis === 'perVehicle' && route.priceCents < km * 5 * 100) return reject('vehicle-fare')
+    if (route.priceBasis === 'perTraveler' && route.priceCents < km * 0.1 * 100) return reject('traveler-fare')
     return true
   })
   if (routes.length !== parsed.routes.length) throw new Error('Velo could not produce a practical route for this request. Try changing your travel preferences.')
