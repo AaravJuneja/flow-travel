@@ -1,10 +1,14 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import {
   addDelaySchema,
+  checkoutSchema,
+  confirmCheckoutSchema,
   createTripSchema,
   registerAccountSchema,
   selectRouteSchema,
   signInSchema,
+  setPasswordSchema,
   tripIdSchema,
   updatePlanSchema,
 } from './validation'
@@ -28,6 +32,13 @@ export const signOut = createServerFn({ method: 'POST' }).handler(async () => {
   return service.signOut()
 })
 
+export const setAccountPassword = createServerFn({ method: 'POST' })
+  .validator(setPasswordSchema)
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    return service.setAccountPassword(data.password)
+  })
+
 export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async () => {
   const service = await import('./services')
   return service.getCurrentUser()
@@ -37,6 +48,20 @@ export const getHomeData = createServerFn({ method: 'GET' }).handler(async () =>
   const service = await import('./services')
   return service.getHomeData()
 })
+
+export const searchIndianCities = createServerFn({ method: 'GET' })
+  .validator(z.object({ query: z.string().trim().min(2).max(100) }))
+  .handler(async ({ data }) => {
+    const { searchCities } = await import('./cities')
+    return searchCities(data.query)
+  })
+
+export const getCityPhoto = createServerFn({ method: 'GET' })
+  .validator(z.object({ code: z.string().regex(/^IN-\d+$/) }))
+  .handler(async ({ data }) => {
+    const { cityPhoto } = await import('./cities')
+    return cityPhoto(data.code)
+  })
 
 export const createTrip = createServerFn({ method: 'POST' })
   .validator(createTripSchema)
@@ -105,3 +130,17 @@ export const getWalletData = createServerFn({ method: 'GET' }).handler(async () 
   const service = await import('./services')
   return service.getWalletData()
 })
+
+export const createCheckoutSession = createServerFn({ method: 'POST' })
+  .validator(checkoutSchema)
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    return service.createCheckoutSession(data.tripId)
+  })
+
+export const confirmCheckoutSession = createServerFn({ method: 'POST' })
+  .validator(confirmCheckoutSchema)
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    return service.confirmCheckoutSession(data)
+  })

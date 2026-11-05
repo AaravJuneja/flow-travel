@@ -1,5 +1,7 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import AppLayout from '../components/AppLayout'
+import TripStatusIcon from '../components/TripStatusIcon'
+import { Clock3 } from 'lucide-react'
 import { getCurrentUser, getHomeData } from '../server/functions'
 import styles from './home.module.css'
 import app from '../styles/app.module.css'
@@ -18,36 +20,26 @@ function HomePage() {
   const firstName = user.name.trim().split(/\s+/u)[0] || 'traveler'
 
   return (
-    <AppLayout name={user.name} active="home">
+    <AppLayout name={user.name} active="home" mobileHeader="location" location={trips[0]?.originName}>
       <div className={app.contentWrap}>
         <section className={styles.welcome}>
           <div className={styles.welcomeCopy}>
-            <p className={app.eyebrow}>Your travel, together</p>
-            <h1 className={app.pageHeading}>Where to next, {firstName}?</h1>
-            <p className={app.pageIntro}>Build a route that fits your time, budget, and the way you like to travel.</p>
-            <Link className={app.buttonPrimary} to="/trip/search">
-              Plan a trip <span aria-hidden="true">↗</span>
+            <p className={styles.greeting}>Hello,</p>
+            <h1 className={app.pageHeading}>{firstName}</h1>
+            <Link className={styles.searchLink} to="/trip/search">
+              <span className={styles.searchIcon}><img src="/assets/home-search.svg" alt="" /></span>Where to?
             </Link>
           </div>
           <div className={styles.routeSketch} aria-hidden="true">
-            <svg viewBox="0 0 420 220" fill="none">
-              <path className={styles.sketchRoad} d="M36 172C98 172 90 87 166 87s70 88 142 35 32-79 78-79" />
-              <path className={styles.sketchRoute} d="M36 172C98 172 90 87 166 87s70 88 142 35 32-79 78-79" />
-              <circle cx="36" cy="172" r="8" />
-              <circle cx="166" cy="87" r="8" />
-              <circle cx="386" cy="43" r="8" />
-            </svg>
-            <span className={styles.sketchLabel}>Your next route</span>
+            <img src="/assets/home-route-artwork.svg" alt="" />
           </div>
         </section>
 
         <section className={styles.tripsSection} id="trips">
           <div className={styles.sectionTop}>
             <div>
-              <h2 className={app.sectionHeading}>Your trips</h2>
-              <p className={app.sectionIntro}>Plans and journeys saved to your account.</p>
+              <h2 className={app.sectionHeading}>Upcoming journeys</h2>
             </div>
-            {trips.length > 0 && <Link className={app.buttonLink} to="/trip/search">Plan another trip <span aria-hidden="true">↗</span></Link>}
           </div>
 
           {trips.length === 0 ? (
@@ -61,20 +53,23 @@ function HomePage() {
             <div className={styles.tripList}>
               {trips.map((trip) => (
                 <article className={`${app.panel} ${styles.tripRow}`} key={trip.id}>
-                  <div className={styles.tripRouteMark} aria-hidden="true"><span /><span /></div>
                   <div className={styles.tripInformation}>
-                    <h3>{trip.originName} to {trip.destinationName}</h3>
-                    <p>{formatDate(trip.departureDate)} at {trip.departureTime} · {trip.travelers} {trip.travelers === 1 ? 'traveler' : 'travelers'}</p>
+                    <h3>{trip.originName} <span aria-hidden="true">→</span> {trip.destinationName}</h3>
+                    <p><img src="/assets/home-calendar.svg" alt="" />{formatDate(trip.departureDate)} <Clock3 size={14} aria-hidden="true" />{trip.departureTime}<span className={styles.tripFare}>{trip.route ? <><span>{Math.floor(trip.route.durationMinutes / 60)}h {trip.route.durationMinutes % 60}m</span><span>{formatMoney(trip.route.totalCents)}</span></> : `${trip.travelers} ${trip.travelers === 1 ? 'traveler' : 'travelers'}`}</span></p>
                   </div>
+                  {trip.route && <div className={styles.transportRoute} aria-label={trip.route.modes.join(' then ')}>{trip.route.modes.map((mode, index) => <span className={styles.transportStop} key={`${mode}-${index}`}><img src={`/assets/transport-${mode === 'Train' ? 'train' : mode === 'Bus' ? 'bus' : 'taxi'}.svg`} alt={mode} /></span>)}</div>}
+                  <div className={styles.tripFooter}>
                   <span className={`${app.statusPill} ${trip.status === 'delayed' ? app.statusDelayed : trip.status === 'completed' ? app.statusCompleted : ''}`}>
-                    <span className={app.statusDot} />{statusLabel(trip.status)}
+                    <TripStatusIcon status={trip.status} />{statusLabel(trip.status)}
                   </span>
                   <TripAction tripId={trip.id} status={trip.status} />
+                  </div>
                 </article>
               ))}
             </div>
           )}
         </section>
+        <Link className={`${app.panel} ${styles.inspiration}`} to="/trip/search"><img src="/assets/home-sparkle.svg" alt="" /><div><h2>What kind of trip do you have in mind?</h2><p>Choose a city in India and tell Velo your budget, pace and interests.</p></div><span aria-hidden="true">›</span></Link>
       </div>
     </AppLayout>
   )
@@ -87,7 +82,7 @@ function TripAction({ tripId, status }: { tripId: string; status: string }) {
   if (status === 'planned') {
     return <Link className={app.buttonSecondary} to="/trip/$tripId/edit" params={{ tripId }}>Edit plan</Link>
   }
-  if (status === 'active' || status === 'delayed') {
+  if (status === 'active' || status === 'delayed' || status === 'completed') {
     return <Link className={app.buttonSecondary} to="/journey/$tripId" params={{ tripId }}>Open journey</Link>
   }
   return <Link className={app.buttonSecondary} to="/wallet">Open wallet</Link>
@@ -105,9 +100,14 @@ function statusLabel(status: string) {
 }
 
 function formatDate(value: string) {
-  return new Date(`${value}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
+  return new Date(`${value}T12:00:00Z`).toLocaleDateString('en-IN', {
+    timeZone: 'UTC',
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
   })
+}
+
+function formatMoney(cents: number) {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(cents / 100)
 }

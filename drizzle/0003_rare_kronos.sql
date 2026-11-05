@@ -1,0 +1,1 @@
+ALTER TABLE `trips` ADD `planner_sources` text DEFAULT '[]' NOT NULL;

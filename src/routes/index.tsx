@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import Brand from '../components/Brand'
+import SlideToStart from '../components/SlideToStart'
 import styles from './welcome.module.css'
 
 export const Route = createFileRoute('/')({
@@ -18,10 +19,9 @@ function Welcome() {
 
         <section className={styles.content} aria-labelledby="welcome-title">
           <div className={styles.illustrationWrap}>
-            <div className={styles.illustrationGlow} aria-hidden="true" />
             <img
               className={styles.traveler}
-              src="/assets/figma/traveler-illustration.png"
+              src="/assets/traveler-illustration.png"
               width="298"
               height="434"
               alt="A traveler setting out with a suitcase"
@@ -29,22 +29,12 @@ function Welcome() {
           </div>
 
           <div className={styles.story}>
-            <p className={styles.slideLabel}>A better way to get there</p>
-            <h1 className={styles.title} id="welcome-title">Welcome to Flow</h1>
+            <h1 className={styles.title} id="welcome-title">Welcome to <span>Flow</span><img src="/assets/flow-mark.svg" alt="" /></h1>
             <p className={styles.description}>
-              Plan the full journey in one place, from your front door to the final stop.
+              Get ready for a smarter, safer, futuristic and more flexible way to travel anywhere, anytime.
             </p>
-            <div className={styles.pagination} aria-label="Welcome screen">
-              <span className={styles.activeDot} />
-              <span />
-              <span />
-              <span />
-            </div>
             <div className={styles.actions}>
-              <Link to="/signup" className={styles.startButton}>
-                Get started
-                <span aria-hidden="true">↗</span>
-              </Link>
+              <SlideToStart />
               <p className={styles.signInPrompt}>
                 Already have an account? <Link to="/login">Sign in</Link>
               </p>

@@ -19,24 +19,25 @@
   --flow-green-soft: #dfe8d6;
   --flow-peach: #f4d6ca;
   --flow-sun: #f2e8bf;
+  --flow-background: url('/assets/background-peach.svg') no-repeat calc(50% - 72px) -303px / 1006px 892px, url('/assets/background-yellow.svg') no-repeat calc(50% + 108px) -114px / 823px 823px, #ebe9e0;
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none;
 }
+
+*::-webkit-scrollbar { display: none; }
 
 html,
 body {
-  min-width: 320px;
+  min-width: 0;
   min-height: 100%;
   margin: 0;
 }
 
 body {
-  background:
-    radial-gradient(ellipse at 21% 8%, rgba(255, 114, 81, 0.14), transparent 31rem),
-    radial-gradient(ellipse at 83% 28%, rgba(255, 218, 149, 0.16), transparent 33rem),
-    var(--flow-canvas);
+  background: var(--flow-background);
   color: var(--flow-ink);
   font-size: 16px;
 }
@@ -114,6 +115,13 @@ textarea:focus-visible {
   clip-path: inset(50%);
   border: 0;
 }
+
+.route-error { min-height: 100svh; display: grid; place-items: center; padding: 28px; background: var(--flow-background); }
+.route-error section { width: min(100%, 420px); padding: 32px; border-radius: 30px; background: #ffffffb3; box-shadow: 0 8px 30px #10192615; }
+.route-error h1 { margin: 24px 0 12px; font-size: 1.8rem; font-weight: 500; letter-spacing: -.03em; }
+.route-error p { color: #747474; line-height: 1.5; }
+.route-error button { width: 100%; min-height: 54px; margin-top: 16px; border: 0; border-radius: 999px; background: #ff907b; color: white; font: inherit; cursor: pointer; }
+.route-error a { display: block; margin-top: 20px; color: #e96548; text-align: center; text-underline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   *,

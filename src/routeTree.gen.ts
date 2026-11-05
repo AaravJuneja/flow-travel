@@ -17,6 +17,7 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as JourneyTripIdRouteImport } from './routes/journey.$tripId'
 import { Route as TripSearchRouteImport } from './routes/trip.search'
 import { Route as JourneyTripIdDelayedRouteImport } from './routes/journey.$tripId.delayed'
+import { Route as PaymentTripIdSuccessRouteImport } from './routes/payment.$tripId.success'
 import { Route as TripTripIdEditRouteImport } from './routes/trip.$tripId.edit'
 import { Route as TripTripIdOptionsRouteImport } from './routes/trip.$tripId.options'
 
@@ -60,6 +61,11 @@ const JourneyTripIdDelayedRoute = JourneyTripIdDelayedRouteImport.update({
   path: '/delayed',
   getParentRoute: () => JourneyTripIdRoute,
 } as any)
+const PaymentTripIdSuccessRoute = PaymentTripIdSuccessRouteImport.update({
+  id: '/payment/$tripId/success',
+  path: '/payment/$tripId/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TripTripIdEditRoute = TripTripIdEditRouteImport.update({
   id: '/trip/$tripId/edit',
   path: '/trip/$tripId/edit',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/journey/$tripId': typeof JourneyTripIdRouteWithChildren
   '/trip/search': typeof TripSearchRoute
   '/journey/$tripId/delayed': typeof JourneyTripIdDelayedRoute
+  '/payment/$tripId/success': typeof PaymentTripIdSuccessRoute
   '/trip/$tripId/edit': typeof TripTripIdEditRoute
   '/trip/$tripId/options': typeof TripTripIdOptionsRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/journey/$tripId': typeof JourneyTripIdRouteWithChildren
   '/trip/search': typeof TripSearchRoute
   '/journey/$tripId/delayed': typeof JourneyTripIdDelayedRoute
+  '/payment/$tripId/success': typeof PaymentTripIdSuccessRoute
   '/trip/$tripId/edit': typeof TripTripIdEditRoute
   '/trip/$tripId/options': typeof TripTripIdOptionsRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/journey/$tripId': typeof JourneyTripIdRouteWithChildren
   '/trip/search': typeof TripSearchRoute
   '/journey/$tripId/delayed': typeof JourneyTripIdDelayedRoute
+  '/payment/$tripId/success': typeof PaymentTripIdSuccessRoute
   '/trip/$tripId/edit': typeof TripTripIdEditRoute
   '/trip/$tripId/options': typeof TripTripIdOptionsRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/journey/$tripId'
     | '/trip/search'
     | '/journey/$tripId/delayed'
+    | '/payment/$tripId/success'
     | '/trip/$tripId/edit'
     | '/trip/$tripId/options'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/journey/$tripId'
     | '/trip/search'
     | '/journey/$tripId/delayed'
+    | '/payment/$tripId/success'
     | '/trip/$tripId/edit'
     | '/trip/$tripId/options'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/journey/$tripId'
     | '/trip/search'
     | '/journey/$tripId/delayed'
+    | '/payment/$tripId/success'
     | '/trip/$tripId/edit'
     | '/trip/$tripId/options'
   fileRoutesById: FileRoutesById
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   JourneyTripIdRoute: typeof JourneyTripIdRouteWithChildren
   TripSearchRoute: typeof TripSearchRoute
+  PaymentTripIdSuccessRoute: typeof PaymentTripIdSuccessRoute
   TripTripIdEditRoute: typeof TripTripIdEditRoute
   TripTripIdOptionsRoute: typeof TripTripIdOptionsRoute
 }
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JourneyTripIdDelayedRouteImport
       parentRoute: typeof JourneyTripIdRoute
     }
+    '/payment/$tripId/success': {
+      id: '/payment/$tripId/success'
+      path: '/payment/$tripId/success'
+      fullPath: '/payment/$tripId/success'
+      preLoaderRoute: typeof PaymentTripIdSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trip/$tripId/edit': {
       id: '/trip/$tripId/edit'
       path: '/trip/$tripId/edit'
@@ -254,6 +274,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   JourneyTripIdRoute: JourneyTripIdRouteWithChildren,
   TripSearchRoute: TripSearchRoute,
+  PaymentTripIdSuccessRoute: PaymentTripIdSuccessRoute,
   TripTripIdEditRoute: TripTripIdEditRoute,
   TripTripIdOptionsRoute: TripTripIdOptionsRoute,
 }

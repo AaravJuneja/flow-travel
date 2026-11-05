@@ -1,6 +1,4 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { ReactNode } from 'react'
 
 import appCss from '../styles.css?url'
@@ -27,7 +25,7 @@ export const Route = createRootRoute({
       {
         rel: 'icon',
         type: 'image/svg+xml',
-        href: '/favicon.svg',
+        href: '/assets/flow-mark.svg',
       },
       {
         rel: 'stylesheet',
@@ -36,7 +34,22 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  errorComponent: RootError,
 })
+
+function RootError() {
+  return (
+    <main className="route-error">
+      <section>
+        <img src="/assets/flow-mark-header.svg" alt="Flow" />
+        <h1>This page couldn’t load</h1>
+        <p>Reload the page to try again.</p>
+        <button type="button" onClick={() => window.location.reload()}>Reload page</button>
+        <a href="/home">Back to my trips</a>
+      </section>
+    </main>
+  )
+}
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
@@ -46,17 +59,6 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
         <Scripts />
       </body>
     </html>

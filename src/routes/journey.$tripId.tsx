@@ -1,6 +1,7 @@
-import { createFileRoute, Link, redirect, useRouter, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouter, useRouterState } from '@tanstack/react-router'
 import { useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
+import TripMap from '../components/TripMap'
 import {
   addJourneyDelay,
   completeNextLeg,
@@ -21,8 +22,13 @@ export const Route = createFileRoute('/journey/$tripId')({
     return data
   },
   head: () => ({ meta: [{ title: 'Your journey | Flow' }] }),
-  component: JourneyPage,
+  component: JourneyRoute,
 })
+
+function JourneyRoute() {
+  const isDelayPage = useRouterState({ select: (state) => state.matches.some((match) => match.routeId === '/journey/$tripId/delayed') })
+  return isDelayPage ? <Outlet /> : <JourneyPage />
+}
 
 function JourneyPage() {
   const data = Route.useLoaderData()
@@ -34,7 +40,8 @@ function JourneyPage() {
   const completedCount = data.segments.filter((segment) => segment.status === 'completed').length
   const currentSegment = data.segments.find((segment) => segment.status === 'current')
   const nextSegment = data.segments.find((segment) => segment.status === 'upcoming')
-  const progress = data.segments.length ? Math.round((completedCount / data.segments.length) * 100) : 0
+  const nextStopName = currentSegment?.toName ?? nextSegment?.toName ?? data.trip.destinationName
+  const nextLeg = currentSegment ?? nextSegment
 
   async function updateJourney(action: () => Promise<unknown>) {
     setBusy(true)
@@ -71,61 +78,57 @@ function JourneyPage() {
   }
 
   return (
-    <AppLayout active="home">
-      <div className={app.contentWrap}>
-        <div className={styles.topline}>
-          <Link className={app.buttonLink} to="/home">‹ My trips</Link>
-          <Link className={app.buttonLink} to="/wallet">Wallet details</Link>
-        </div>
-
-        <section className={`${app.panel} ${styles.journeyHero}`}>
-          <div className={styles.journeyIntro}>
-            <p className={app.eyebrow}>Your journey</p>
-            <h1 className={app.pageHeading}>{data.trip.destinationName}, here you come.</h1>
-            <p className={app.pageIntro}>{data.trip.originName} to {data.trip.destinationName} on {formatDate(data.trip.departureDate)}.</p>
-            <span className={`${app.statusPill} ${data.trip.status === 'delayed' ? app.statusDelayed : data.trip.status === 'completed' ? app.statusCompleted : ''}`}>
-              <span className={app.statusDot} />{statusLabel(data.trip.status)}
-            </span>
-          </div>
-          <div className={styles.progressVisual} aria-label={`${progress}% of journey complete`} role="img">
-            <div className={styles.routeArtwork} aria-hidden="true">
-              <span className={styles.routeStart} />
-              <span className={styles.routeMiddle} />
-              <span className={styles.routeEnd} />
-              <span className={styles.routePath} />
-            </div>
-            <p>{completedCount} of {data.segments.length} steps complete</p>
-          </div>
+    <AppLayout active="home" mobileNavigation={false}>
+      <div className={styles.screen}>
+        <section className={styles.mapScene} aria-label="Journey map">
+          <div className={styles.mapCanvas}><TripMap destinationCode={data.trip.destinationCode} originCity={data.originCity ?? undefined} destinationCity={data.destinationCity ?? undefined} /></div>
+          <header className={styles.pageHeader}>
+            <Link className={styles.backLink} to="/home" aria-label="Back to my trips">
+              <img src="/assets/figma/journey/back-arrow.svg" alt="" />
+            </Link>
+            <h1 className={styles.visuallyHidden}>Your journey</h1>
+            <Link className={styles.flowMark} to="/home" aria-label="Flow home"><img src="/assets/flow-mark-header.svg" alt="" /></Link>
+          </header>
         </section>
 
-        <div className={styles.journeyGrid}>
-          <section className={`${app.panel} ${styles.timelinePanel}`}>
-            <div className={styles.panelHeading}>
-              <div><h2 className={app.sectionHeading}>Your route</h2><p className={app.sectionIntro}>{data.selectedOption?.title} · {formatDuration(data.selectedOption?.durationMinutes ?? 0)}</p></div>
-              {data.trip.status === 'planned' && <Link className={app.buttonLink} to="/trip/$tripId/edit" params={{ tripId: data.trip.id }}>Edit plan</Link>}
+        <div className={styles.journeySheet}>
+          <img className={styles.sheetHandle} src="/assets/figma/journey/sheet-handle.svg" alt="" />
+          <div className={styles.sheetContent}>
+            <section className={`${app.panel} ${styles.nextCard}`}>
+              <p className={styles.nextEyebrow}>{data.trip.status === 'completed' ? 'Destination' : 'Next stop'}</p>
+              <h2>{nextStopName}</h2>
+              <p className={styles.nextMeta}>
+                {nextLeg ? `${nextLeg.mode} ${nextLeg.status === 'current' ? 'in progress' : 'up next'}` : 'Journey complete'}
+              </p>
+              <div className={styles.nextActions}>
+                <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(nextStopName)}`} target="_blank" rel="noreferrer">
+                  View on map <span aria-hidden="true">↗</span>
+                </a>
+                {data.trip.status === 'planned' && <Link to="/trip/$tripId/edit" params={{ tripId: data.trip.id }}>Edit trip</Link>}
+              </div>
+            </section>
+
+            <div className={styles.journeyLabel}>
+              <span>Your journey</span>
+              <span className={styles.progressCount}>{completedCount} of {data.segments.length} complete</span>
             </div>
 
-            <div className={styles.timeline}>
-              {data.segments.map((segment, index) => (
-                <article className={`${styles.timelineStep} ${segment.status === 'current' ? styles.currentStep : ''}`} key={segment.id}>
-                  <div className={styles.timelineMarker} aria-hidden="true">
-                    {segment.status === 'completed' ? '✓' : index + 1}
-                  </div>
-                  <div className={styles.timelineContent}>
-                    <div className={styles.timelineTop}>
-                      <div><p>{segment.mode}</p><h3>{segment.fromName} to {segment.toName}</h3></div>
-                      <span>{segment.departureTime} to {segment.arrivalTime}</span>
-                    </div>
-                    {segment.note && <p className={styles.segmentNote}>{segment.note}</p>}
-                    {segment.status === 'current' && <span className={styles.stepStatus}>Current step</span>}
-                    {segment.status === 'completed' && <span className={styles.stepStatus}>Completed</span>}
-                  </div>
-                </article>
-              ))}
-            </div>
+            <section className={`${app.panel} ${styles.timelinePanel}`} aria-label="Journey steps">
+              <div className={styles.timeline}>
+                {data.segments.map((segment) => (
+                  <JourneyStep
+                    key={segment.id}
+                    segment={segment}
+                  />
+                ))}
+                {!data.segments.length && <p className={styles.emptyTimeline}>No journey steps have been added yet.</p>}
+              </div>
+            </section>
+
+            <p className={styles.manualNote}>Mark each step reached to update your journey.</p>
 
             {error && <p className={app.errorNotice} role="alert">{error}</p>}
-            <div className={styles.journeyActions}>
+            <section className={styles.actionPanel} aria-label="Journey actions">
               {data.trip.status === 'planned' && (
                 <button className={app.buttonPrimary} type="button" disabled={busy} onClick={() => void updateJourney(() => startJourney({ data: { tripId: data.trip.id } }))}>
                   {busy ? 'Starting journey' : 'Start my journey'}
@@ -136,7 +139,7 @@ function JourneyPage() {
                   {busy ? 'Saving progress' : `Mark ${currentSegment.toName} reached`}
                 </button>
               )}
-              {data.trip.status === 'active' && nextSegment && !currentSegment && (
+              {data.trip.status === 'active' && !currentSegment && (
                 <p className={app.notice}>All route steps are complete. Your journey is ready to close.</p>
               )}
               {data.trip.status === 'active' && (
@@ -148,11 +151,12 @@ function JourneyPage() {
                 <Link className={app.buttonPrimary} to="/journey/$tripId/delayed" params={{ tripId: data.trip.id }}>View delay update</Link>
               )}
               {data.trip.status === 'completed' && <p className={app.notice}>You have completed this journey.</p>}
-            </div>
+            </section>
 
             {delayFormOpen && data.trip.status === 'active' && (
               <form className={styles.delayForm} onSubmit={submitDelay}>
-                <h3>Log the change</h3>
+                <h2>Log a journey change</h2>
+                <p>Add the details of your journey update.</p>
                 <div className={styles.delayFields}>
                   <label className={app.field}>
                     <span className={app.fieldLabel}>Delay in minutes</span>
@@ -166,54 +170,70 @@ function JourneyPage() {
                 <button className={app.buttonSecondary} type="submit" disabled={busy}>{busy ? 'Saving update' : 'Save delay update'}</button>
               </form>
             )}
-          </section>
 
-          <aside className={styles.sideColumn}>
-            <section className={`${app.panel} ${styles.nextCard}`}>
-              <p className={app.eyebrow}>Next step</p>
-              {currentSegment ? (
-                <><h2>{currentSegment.toName}</h2><p>Continue by {currentSegment.mode.toLowerCase()} from {currentSegment.fromName}.</p></>
-              ) : nextSegment ? (
-                <><h2>{nextSegment.fromName}</h2><p>Your first step is {nextSegment.mode.toLowerCase()} to {nextSegment.toName}.</p></>
-              ) : (
-                <><h2>Journey complete</h2><p>Your route steps have been marked complete.</p></>
-              )}
-            </section>
-            <section className={`${app.panel} ${styles.updatesCard}`}>
-              <h2 className={app.sectionHeading}>Your updates</h2>
-              <p className={styles.manualNote}>Status changes are based on the updates you log. Flow does not receive operator alerts.</p>
-              {data.events.length ? (
-                <ol className={styles.eventList}>
-                  {data.events.slice(0, 4).map((event) => (
-                    <li key={event.id}>
-                      <span>{event.type === 'delay' ? `${event.delayMinutes} minute delay` : event.message}</span>
-                      <time dateTime={new Date(event.createdAt).toISOString()}>{formatTime(event.createdAt)}</time>
-                    </li>
-                  ))}
-                </ol>
-              ) : <p className={styles.emptyUpdates}>Journey updates appear here as you log them.</p>}
-            </section>
-          </aside>
+            <footer className={styles.footerLinks}>
+              <Link to="/wallet">Wallet details</Link>
+              {data.trip.status === 'planned' && <Link to="/trip/$tripId/edit" params={{ tripId: data.trip.id }}>Edit trip details</Link>}
+            </footer>
+          </div>
         </div>
       </div>
     </AppLayout>
   )
 }
 
-function statusLabel(status: string) {
-  const labels: Record<string, string> = { planned: 'Ready to start', active: 'In progress', delayed: 'Delayed', completed: 'Completed' }
-  return labels[status] ?? 'Planning'
+type JourneySegment = { id: string; mode: string; fromName: string; toName: string; departureTime: string; arrivalTime: string; departureDay: number; arrivalDay: number; status: string; note: string | null }
+
+function JourneyStep({ segment }: { segment: JourneySegment }) {
+  const status = segment.status === 'completed' ? 'completed' : segment.status === 'current' ? 'ongoing' : 'upcoming'
+  const hasDayLabels = segment.departureDay > 0 || segment.arrivalDay > 0
+  const departure = hasDayLabels ? `${segment.departureTime} (Day ${segment.departureDay + 1})` : segment.departureTime
+  const arrival = hasDayLabels ? `${segment.arrivalTime} (Day ${segment.arrivalDay + 1})` : segment.arrivalTime
+  const rolloverDays = Math.max(0, segment.arrivalDay - segment.departureDay)
+  const statusIcon = status === 'completed'
+    ? '/assets/figma/journey/check-completed.svg'
+    : status === 'ongoing'
+      ? '/assets/figma/journey/check-ongoing.svg'
+      : '/assets/figma/journey/check-upcoming.svg'
+  const modeIcon = getModeIcon(segment.mode)
+  const isRasterIcon = modeIcon?.endsWith('.png') ?? false
+  const isTrain = segment.mode.toLowerCase() === 'train'
+  const badgeIcon = isTrain
+    ? '/assets/figma/journey/train-badge.svg'
+    : '/assets/figma/journey/icon-badge.svg'
+
+  return (
+    <article className={`${styles.timelineStep} ${status === 'ongoing' ? styles.currentStep : ''}`}>
+      <div className={styles.modeBadge} aria-hidden="true">
+        <img className={styles.badgeArtwork} src={badgeIcon} alt="" />
+        {!isTrain && (modeIcon ? <img className={isRasterIcon ? styles.modeGlyphRaster : styles.modeGlyph} src={modeIcon} alt="" /> : <span className={styles.modeInitial}>{segment.mode.slice(0, 1)}</span>)}
+      </div>
+      <div className={styles.timelineContent}>
+        <div className={styles.segmentHeading}>
+          <div className={styles.segmentName}>
+            <h3>{segment.mode}</h3>
+            <p>{segment.fromName} to {segment.toName}</p>
+          </div>
+          <span className={`${styles.stepStatus} ${styles[status]}`}>
+            <img src={statusIcon} alt="" />
+            {status === 'ongoing' ? 'Ongoing' : status === 'completed' ? 'Completed' : 'Upcoming'}
+          </span>
+        </div>
+        <p className={styles.segmentTime}>
+          <span>{departure} to {arrival}</span>
+          {rolloverDays > 0 && <span className={styles.dayRollover}>+{rolloverDays} day{rolloverDays === 1 ? '' : 's'}</span>}
+        </p>
+        {segment.note && <p className={styles.segmentNote}>{segment.note}</p>}
+      </div>
+    </article>
+  )
 }
 
-function formatDate(value: string) {
-  return new Date(`${value}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
-}
-
-function formatDuration(minutes: number) {
-  const hours = Math.floor(minutes / 60)
-  return `${hours}h ${String(minutes % 60).padStart(2, '0')}m`
-}
-
-function formatTime(value: number) {
-  return new Date(value).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+function getModeIcon(mode: string) {
+  const normalized = mode.toLowerCase()
+  if (normalized.includes('train') || normalized.includes('metro') || normalized.includes('rail')) return '/assets/figma/journey/train.svg'
+  if (normalized.includes('cab') || normalized.includes('taxi') || normalized.includes('car')) return '/assets/figma/journey/taxi.svg'
+  if (normalized.includes('auto')) return '/assets/figma/journey/auto.png'
+  if (normalized.includes('bus') || normalized.includes('coach')) return '/assets/transport-bus.svg'
+  return null
 }

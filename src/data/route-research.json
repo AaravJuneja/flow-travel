@@ -1,0 +1,42 @@
+[
+  {
+    "id": "gurugram-agra-uber-2026-11-05",
+    "originCode": "IN-1270642",
+    "destinationCode": "IN-1279259",
+    "title": "Gurugram to Agra cab estimates",
+    "url": "https://www.uber.com/in/en/r/intercity/gurgaon-haryana-to-agra-uttar-pradesh",
+    "publisher": "Uber Intercity",
+    "checkedAt": "2026-11-05",
+    "text": "Published route page lists average road distance 204 km and average journey 4 hours. Published example fares: Go Intercity INR 2132 for 1 to 4 seats, Sedan INR 2401 for 1 to 4 seats, XL INR 2953 for 1 to 6 seats. These are indicative per-vehicle figures read on 5 November 2026, not a quote for the travel date. Account for pickup traffic and check toll inclusion. A direct cab is plausible; do not propose a flight for this short route."
+  },
+  {
+    "id": "gurugram-agra-zingbus-2026-11-05",
+    "originCode": "IN-1270642",
+    "destinationCode": "IN-1279259",
+    "title": "Gurugram to Agra bus estimates",
+    "url": "https://www.zingbus.com/bus-tickets/gurgaon-to-agra-bus-route",
+    "publisher": "zingbus",
+    "checkedAt": "2026-11-05",
+    "text": "Published route page lists approximately 201 km, average duration 3 hours 45 minutes, and indicative starting fare INR 535 per passenger, with higher fares up to INR 2010 depending on service. This establishes direct bus service as plausible, not a departure or availability guarantee. Include travel from Sector 65 to the chosen Gurugram boarding point and local arrival travel in Agra. Do not invent a boarding point or a confirmed departure."
+  },
+  {
+    "id": "gurugram-agra-rail-context-2026-11-05",
+    "originCode": "IN-1270642",
+    "destinationCode": "IN-1279259",
+    "title": "Gurugram to Agra rail connection",
+    "url": "https://www.rome2rio.com/s/Gurgaon/Agra",
+    "publisher": "Rome2Rio",
+    "checkedAt": "2026-11-05",
+    "text": "Published route planner describes Delhi Metro from IFFCO Chowk to New Delhi followed by an Indian Railways train from New Delhi to Agra Cantt. It lists an indicative combined duration around 3 hours 27 minutes and fare range INR 215 to INR 1459, depending on class and service. This is a connection via Delhi, not evidence of a direct train from Gurugram to Agra. Include Sector 65 pickup to IFFCO Chowk, transfer buffers, and an Agra Cantt to Agra local leg where relevant. Additional last-mile costs sit outside the published base range. No train number, seat availability or timetable has been verified for the user's date."
+  },
+  {
+    "id": "gurugram-agra-taj-2026-11-05",
+    "originCode": "IN-1270642",
+    "destinationCode": "IN-1279259",
+    "title": "Taj Mahal visitor information",
+    "url": "https://www.tajmahal.gov.in/ticketing.aspx/visiting-hours.aspx",
+    "publisher": "Uttar Pradesh Tourism",
+    "checkedAt": "2026-11-05",
+    "text": "The official Taj Mahal site says the Taj Mahal is closed to general visitors every Friday. Its published Indian visitor entry price is INR 50, with an additional INR 200 for the main mausoleum. These are sightseeing costs, separate from transport. Do not infer the traveler's nationality. For a Saturday and Sunday two-day visit, the Taj Mahal can be planned on either day subject to current opening rules."
+  }
+]

@@ -1,16 +1,75 @@
-.delayCard { display: grid; gap: 15px; margin-top: 23px; padding: clamp(24px, 5vw, 44px); }
-.signal { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: #f6dfd1; color: #a55f43; font-size: 1.3rem; font-weight: 800; }
-.delayEyebrow { margin: 3px 0 0; color: #a35d43; font-size: 0.77rem; font-weight: 750; }
-.delayTitle { max-width: 500px; margin: 0; font-size: clamp(2.25rem, 6vw, 3.7rem); font-weight: 660; letter-spacing: -0.075em; line-height: 0.98; }
-.delayIntro { margin: -6px 0 2px; color: var(--flow-muted); font-size: 0.91rem; }
-.delayDetail { display: flex; align-items: center; gap: 18px; padding: 19px 0; border-top: 1px solid #e6e9e2; border-bottom: 1px solid #e6e9e2; }
-.delayDuration { display: flex; align-items: baseline; gap: 3px; color: #a55f43; font-size: 2.35rem; font-weight: 720; letter-spacing: -0.06em; }
-.delayDuration small { font-size: 0.83rem; font-weight: 700; letter-spacing: 0; }
-.delayDetail h2 { margin: 0; color: var(--flow-ink); font-size: 1rem; font-weight: 700; }
-.delayDetail p { margin: 4px 0 0; color: #78868a; font-size: 0.77rem; }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 3px; }
+.screen { --delay-bleed: clamp(22px, 7.2vw, 32px); position: relative; min-height: 100%; isolation: isolate; }
+.content { position: relative; z-index: 1; width: min(100%, 760px); margin-inline: auto; }
+.pageHeader { display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; align-items: center; gap: 14px; margin-bottom: 24px; }
+.backLink { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; text-decoration: none; }
+.backLink:hover { background: rgba(255, 255, 255, 0.52); }
+.backLink img { display: block; transform: rotate(180deg); }
+.heading h1 { margin: 0; color: #101926; font-size: 23px; font-weight: 500; letter-spacing: -0.035em; line-height: 1.2; }
+.heading p { margin: 6px 0 0; color: #6b6b6b; font-size: 14px; line-height: 1.4; }
+.flowMark { display: block; justify-self: end; align-self: start; }
+.flowMark img { display: block; }
+@media (min-width: 761px) { .flowMark { display: none; } }
 
-@media (max-width: 460px) {
-  .actions { flex-direction: column; }
+.delayNotice { display: grid; gap: 15px; margin-top: 24px; padding: 25px 28px; border: 0; border-radius: 30px; background: linear-gradient(115deg, #efb4ae 0%, #f0bea2 100%); box-shadow: 0 12px 30px rgba(126, 86, 68, 0.16); }
+.delayHeading { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: start; gap: 17px; }
+.warningIcon { width: 45px; height: 45px; display: grid; place-items: center; border-radius: 50%; background: #ff7b74; }
+.delayHeading h2 { margin: 1px 0 0; color: #101926; font-size: 21px; font-weight: 500; letter-spacing: -0.025em; line-height: 1.25; }
+.delayHeading h2 strong { font-weight: 600; }
+.delayHeading > div > p { margin: 8px 0 0; color: #fff; font-size: 16px; line-height: 1.4; }
+.delayHeading > div > .delayLogged { margin-top: 5px; color: rgba(16, 25, 38, 0.65); font-size: 12px; }
+.delayCopy { margin: 0; color: #fff; font-size: 15px; line-height: 1.45; }
+
+.sectionLabel { margin: 43px 5px 12px; color: #101926; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; }
+.timelinePanel { display: grid; gap: 12px; padding: 23px; border: 0; border-radius: 30px; background: rgba(255, 255, 255, 0.72); box-shadow: 0 10px 28px rgba(93, 83, 72, 0.12); }
+.timelineStep { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: start; gap: 14px; padding: 14px 16px; border: 1px solid #d9d7d0; border-radius: 20px; background: rgba(255, 255, 255, 0.18); }
+.modeBadge { position: relative; width: 40px; height: 40px; display: grid; place-items: center; }
+.badgeArtwork { position: absolute; top: 0; left: 0; display: block; }
+.modeGlyph { position: relative; z-index: 1; display: block; }
+.modeInitial { position: relative; z-index: 1; color: #101926; font-size: 15px; font-weight: 600; }
+.segmentContent { min-width: 0; }
+.segmentHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.segmentHeading h3 { margin: 0; color: #101926; font-size: 18px; font-weight: 500; letter-spacing: -0.025em; }
+.segmentHeading > span { flex: none; font-size: 12px; }
+.completed { color: #136507; }
+.ongoing { color: #d78c00; }
+.upcoming { color: #0064d7; }
+.segmentRoute { margin: 3px 0 0; color: #737373; font-size: 13px; }
+.segmentTime { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 0; color: #777; font-size: 12px; line-height: 1.45; }
+.dayRollover { padding: 2px 7px; border-radius: 999px; background: #f6e8c8; color: #8e6434; font-size: 11px; font-weight: 600; }
+.segmentNote { margin: 6px 0 0; color: #737373; font-size: 12px; line-height: 1.4; }
+.emptyTimeline { margin: 0; color: #737373; font-size: 14px; }
+.manualNote { margin: 1px 0 0; color: #737373; font-size: 12px; line-height: 1.5; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+.actions > * { min-height: 60px; font-weight: 500; }
+.reassurance { position: relative; z-index: 1; margin: 22px 8px 0; color: #7b7b7b; font-size: 13px; line-height: 1.5; }
+.routeArtwork { position: relative; width: min(calc(100% + 2 * var(--delay-bleed)), 477px); height: 167px; margin: 41px 0 -62px calc(-1 * var(--delay-bleed)); overflow: hidden; pointer-events: none; }
+.routeCurve { position: absolute; top: 0; left: 0; display: block; transform: rotate(-6.29deg); transform-origin: center; }
+
+@media (max-width: 620px) {
+  .pageHeader { grid-template-columns: 42px minmax(0, 1fr) 38px; gap: 12px; margin-bottom: 22px; }
+  .heading h1 { font-size: 23px; }
+  .heading p { font-size: 12px; }
+  .delayNotice { gap: 13px; padding: 22px 21px; border-radius: 30px; }
+  .delayHeading { grid-template-columns: 45px minmax(0, 1fr); gap: 12px; }
+  .delayHeading h2 { font-size: 19px; }
+  .delayHeading > div > p { font-size: 15px; }
+  .delayCopy { font-size: 14px; }
+  .sectionLabel { margin-top: 42px; }
+  .timelinePanel { gap: 12px; padding: 21px; border-radius: 30px; }
+  .timelineStep { grid-template-columns: 40px minmax(0, 1fr); gap: 14px; padding: 14px 16px; }
+  .segmentHeading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .actions { grid-template-columns: 1fr; margin-top: 6px; }
   .actions > * { width: 100%; }
+  .routeArtwork { margin-top: 33px; }
+}
+
+@media (max-width: 380px) {
+  .delayNotice { padding-inline: 17px; }
+  .delayHeading { grid-template-columns: 40px minmax(0, 1fr); gap: 10px; }
+  .timelinePanel { padding: 16px; }
+  .timelineStep { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; padding: 13px; }
+}
+
+@media (min-width: 761px) {
+  .screen { --delay-bleed: clamp(32px, 4.7vw, 72px); }
 }

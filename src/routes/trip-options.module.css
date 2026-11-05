@@ -1,34 +1,356 @@
-.topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.step { color: #7a898d; font-size: 0.75rem; font-weight: 650; }
-.heading { margin-bottom: 22px; }
-.heading .pageHeading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.headingLine { width: clamp(30px, 5vw, 68px); height: 1px; display: inline-block; background: #8db5a7; }
-.optionGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
-.optionCard { min-height: 305px; display: flex; flex-direction: column; padding: 21px; }
-.optionSelected { border-color: #75aaa0; box-shadow: 0 0 0 2px rgba(22, 123, 120, 0.1); }
-.optionHeading { display: flex; align-items: center; gap: 12px; }
-.modeIcon { width: 42px; height: 42px; display: grid; flex: none; place-items: center; border-radius: 14px; background: #eaf2e9; color: #347e74; font-size: 1.15rem; }
-.optionMode { margin: 0 0 3px; color: #77868a; font-size: 0.71rem; font-weight: 650; }
-.optionHeading h2 { margin: 0; font-size: 1.02rem; font-weight: 700; letter-spacing: -0.03em; }
-.fastest { margin-left: auto; padding: 5px 8px; border-radius: 999px; background: #f8ece2; color: #a6634e; font-size: 0.63rem; font-weight: 700; }
-.optionSummary { min-height: 47px; margin: 17px 0 14px; color: var(--flow-muted); font-size: 0.82rem; line-height: 1.5; }
-.optionStats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-block: 13px; border-top: 1px solid #e7ebe4; border-bottom: 1px solid #e7ebe4; }
-.optionStats p { display: grid; gap: 4px; margin: 0; }
-.optionStats span { color: #78868a; font-size: 0.67rem; }
-.optionStats strong { color: #30484e; font-size: 0.83rem; font-weight: 700; }
-.optionPrice { display: flex; align-items: end; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 17px; }
-.optionPrice > div { display: grid; gap: 3px; }
-.optionPrice > div strong { font-size: 1.15rem; letter-spacing: -0.04em; }
-.optionPrice > div span { color: #7a898d; font-size: 0.64rem; }
-.optionPrice button { padding-inline: 12px; font-size: 0.76rem; }
+.heading {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
 
-@media (max-width: 960px) {
+.backLink {
+  width: 38px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: #101926;
+  font-size: 2.7rem;
+  font-weight: 400;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.headingCopy { min-width: 0; }
+
+.headingCopy h1 {
+  margin: 0;
+  color: #101926;
+  font-size: clamp(1.45rem, 2.1vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+
+.headingCopy p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 7px 0 0;
+  color: #646464;
+  font-size: 0.91rem;
+  line-height: 1.35;
+}
+
+.summaryDivider { font-size: 0.75rem; }
+
+.flowMark {
+  display: block;
+  justify-self: end;
+  align-self: start;
+}
+.flowMark img { display: block; }
+@media (min-width: 761px) { .flowMark { display: none; } }
+
+.estimateNotice {
+  margin: 0 0 18px;
+  color: #747474;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(9px, 1.5vw, 16px);
+  margin-top: 18px;
+}
+
+.optionCard {
+  min-width: 0;
+  min-height: 335px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 23px;
+  background: rgba(255, 255, 255, 0.67);
+  box-shadow: 0 10px 28px rgba(93, 83, 72, 0.1);
+}
+
+.optionSelected {
+  border: 2px solid #ffc1ad;
+  box-shadow: 0 10px 28px rgba(93, 83, 72, 0.12);
+}
+
+.optionSelect {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 16px 12px;
+  border: 0;
+  background: transparent;
+  color: #101926;
+  text-align: center;
+  cursor: pointer;
+}
+
+.optionSelect:focus-visible {
+  outline: 3px solid rgba(255, 114, 81, 0.45);
+  outline-offset: -4px;
+  border-radius: 21px;
+}
+
+.cardBadges {
+  min-height: 24px;
+  order: 8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.fastest,
+.lowest,
+.selectedBadge {
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 0.63rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.fastest { background: #f3e9c8; color: #554c34; }
+.lowest { background: #f7e6df; color: #8b4a39; }
+.selectedBadge { background: #e4eadc; color: #526548; }
+
+.optionTitle {
+  width: 100%;
+  min-height: 43px;
+  display: grid;
+  place-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(16, 25, 38, 0.12);
+  font-size: clamp(0.86rem, 1.15vw, 1rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.optionMode {
+  margin-top: 7px;
+  color: #747474;
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.legIcons {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.legIcon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f0e7c9;
+}
+
+.legIcon img {
+  display: block;
+}
+
+.optionDuration {
+  margin-top: 12px;
+  color: #7e7e7e;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.optionPrice {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  margin-top: 25px;
+  padding: 13px 0 14px;
+  border-bottom: 1px solid rgba(16, 25, 38, 0.12);
+}
+
+.optionPrice strong {
+  font-size: clamp(1.12rem, 1.7vw, 1.52rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.optionPrice > span {
+  color: #777;
+  font-size: 0.68rem;
+}
+
+.optionChanges {
+  min-height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(252, 198, 199, 0.45), rgba(249, 230, 166, 0.48));
+  color: #101926;
+  font-size: 0.68rem;
+}
+
+.details {
+  margin: 0 15px 14px;
+  color: #747474;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.details summary {
+  color: #965343;
+  cursor: pointer;
+  text-align: center;
+  text-underline-offset: 2px;
+}
+
+.details p { margin: 8px 0 0; }
+
+.sourceNote { color: #747474; }
+
+.sourceNote a,
+.sourceLine a {
+  color: #8f4838;
+  font-weight: 600;
+  text-underline-offset: 2px;
+}
+
+.estimateDetails {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  margin-top: 34px;
+  padding: 19px;
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.sparkleBadge {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 5px 15px rgba(56, 48, 45, 0.12);
+}
+
+.sparkleBadge img {
+  display: block;
+}
+
+.sparkleBadge img:last-child {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+}
+
+.estimateDetails h2 {
+  margin: 0 0 5px;
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.estimateDetails p {
+  margin: 0;
+  color: #53565a;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.sourceLine {
+  display: block;
+  margin-top: 8px;
+  color: #777;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.actionArea {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.actionArea button {
+  width: 100%;
+  min-height: 64px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.actionArea p {
+  margin: 0;
+  color: #777;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
   .optionGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .optionCard { min-height: 330px; }
 }
 
 @media (max-width: 640px) {
-  .optionGrid { grid-template-columns: 1fr; }
-  .optionCard { min-height: 0; }
-  .heading .pageHeading { gap: 8px; }
-  .optionSummary { min-height: 0; }
+  .heading { grid-template-columns: 40px minmax(0, 1fr) 32px; gap: 8px; margin-bottom: 12px; }
+  .backLink { width: 34px; height: 38px; font-size: 2.45rem; }
+  .headingCopy h1 { font-size: 1.45rem; }
+  .headingCopy p { gap: 7px; margin-top: 6px; font-size: 0.82rem; }
+  .estimateNotice { margin-bottom: 13px; font-size: 0.72rem; }
+  .optionGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 14px; }
+  .optionCard { min-height: 338px; border-radius: 20px; }
+  .optionSelect { padding: 13px 8px 10px; }
+  .cardBadges { min-height: 24px; gap: 3px; margin-top: 12px; margin-bottom: 0; }
+  .fastest, .lowest, .selectedBadge { padding: 4px 5px; font-size: 0.55rem; }
+  .optionTitle { min-height: 44px; padding-bottom: 8px; font-size: 0.85rem; }
+  .optionMode { min-height: 28px; font-size: 0.65rem; }
+  .legIcons { min-height: 42px; gap: 5px; margin-top: 25px; flex-wrap: wrap; }
+  .legIcon { width: 34px; height: 34px; flex-basis: 34px; }
+  .optionDuration { margin-top: 9px; font-size: 0.8rem; }
+  .optionPrice { margin-top: 18px; padding: 11px 0 12px; }
+  .optionPrice strong { font-size: clamp(1rem, 5vw, 1.3rem); }
+  .optionPrice > span { min-height: 26px; font-size: 0.61rem; line-height: 1.25; }
+  .optionChanges { font-size: 0.61rem; }
+  .details { margin-inline: 8px; font-size: 0.65rem; }
+  .estimateDetails { grid-template-columns: 40px minmax(0, 1fr); gap: 10px; margin-top: 24px; padding: 16px; border-radius: 22px; }
+  .sparkleBadge { width: 40px; height: 40px; }
+  .estimateDetails h2 { font-size: 0.9rem; }
+  .estimateDetails p { font-size: 0.81rem; }
+  .actionArea { margin-top: 20px; }
+  .actionArea button { min-height: 62px; }
+  .actionArea p { font-size: 0.75rem; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .optionSelect { transition: none; }
+}
+.veloPlan { margin-bottom: 22px; padding: 24px; }
+.veloPlan h2 { margin: 0 0 12px; font-size: 1.15rem; font-weight: 500; }
+.veloPlan p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .93rem; line-height: 1.7; color: #626660; }
+.guideSources { margin-top: 16px; color: #73766e; font-size: .73rem; }
+.guideSources summary { cursor: pointer; }
+.guideSources > div { display: grid; gap: 8px; margin-top: 10px; }
+.guideSources a { color: inherit; }

@@ -1,61 +1,112 @@
-.topline { display: flex; justify-content: space-between; margin-bottom: 18px; }
-.journeyHero { min-height: 260px; display: grid; grid-template-columns: 1fr 0.82fr; align-items: center; gap: 30px; padding: clamp(24px, 5vw, 48px); overflow: hidden; }
-.journeyIntro { max-width: 570px; }
-.journeyIntro .pageHeading { font-size: clamp(2.1rem, 4vw, 3.5rem); }
-.journeyIntro .pageIntro { margin-bottom: 17px; }
-.progressVisual { position: relative; min-height: 170px; display: grid; align-content: center; justify-items: center; border-radius: 18px; background-color: #eaf1e8; background-image: repeating-linear-gradient(155deg, transparent 0 35px, rgba(63, 117, 98, 0.09) 36px 37px, transparent 38px 65px); }
-.progressVisual > p { margin: 15px 0 0; color: #637a74; font-size: 0.72rem; font-weight: 700; }
-.routeArtwork { position: relative; width: 76%; height: 48px; }
-.routePath { position: absolute; top: 23px; left: 8px; right: 8px; height: 2px; background: repeating-linear-gradient(90deg, #197d79 0 7px, transparent 7px 13px); }
-.routeStart,
-.routeMiddle,
-.routeEnd { position: absolute; z-index: 1; top: 17px; width: 14px; height: 14px; border: 3px solid #fffefa; border-radius: 50%; background: #167b78; box-shadow: 0 0 0 1px #91b9a8; }
-.routeStart { left: 0; }
-.routeMiddle { left: 50%; background: #e07a60; }
-.routeEnd { right: 0; }
-.journeyGrid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr); gap: 15px; margin-top: 17px; align-items: start; }
-.timelinePanel { padding: clamp(20px, 3.5vw, 30px); }
-.panelHeading { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.panelHeading > a { white-space: nowrap; }
-.timeline { display: grid; }
-.timelineStep { position: relative; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 13px; padding-bottom: 23px; }
-.timelineStep:not(:last-child)::before { position: absolute; top: 29px; bottom: 0; left: 13px; border-left: 1px dashed #a6c3b6; content: ''; }
-.timelineMarker { position: relative; z-index: 1; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid #bed0c4; border-radius: 50%; background: #f3f7f0; color: #4a796d; font-size: 0.7rem; font-weight: 760; }
-.currentStep .timelineMarker { border-color: var(--flow-teal); background: var(--flow-teal); color: white; box-shadow: 0 0 0 4px #e1eee5; }
-.timelineContent { min-width: 0; padding-top: 2px; }
-.timelineTop { display: flex; justify-content: space-between; gap: 12px; }
-.timelineTop p { margin: 0 0 3px; color: #74837f; font-size: 0.7rem; font-weight: 650; }
-.timelineTop h3 { margin: 0; font-size: 0.93rem; font-weight: 700; letter-spacing: -0.02em; }
-.timelineTop > span { color: #77868a; font-size: 0.72rem; white-space: nowrap; }
-.segmentNote { margin: 8px 0 0; color: #62746f; font-size: 0.78rem; }
-.stepStatus { display: inline-block; margin-top: 8px; color: var(--flow-teal); font-size: 0.68rem; font-weight: 750; }
-.journeyActions { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 5px; }
-.delayForm { display: grid; gap: 16px; margin-top: 18px; padding: 17px; border-radius: 14px; background: #f0f4ed; }
-.delayForm h3 { margin: 0; font-size: 0.93rem; }
-.delayFields { display: grid; grid-template-columns: 0.6fr 1fr; gap: 12px; }
-.sideColumn { display: grid; gap: 14px; }
-.nextCard,
-.updatesCard { padding: 21px; }
-.nextCard h2 { margin: 7px 0; font-size: 1.22rem; font-weight: 690; letter-spacing: -0.04em; }
-.nextCard > p:last-child { margin: 0; color: var(--flow-muted); font-size: 0.82rem; line-height: 1.5; }
-.updatesCard > h2 { margin-bottom: 8px; }
-.manualNote { margin: 0; color: #728188; font-size: 0.75rem; line-height: 1.5; }
-.eventList { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
-.eventList li { display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid #e5eae2; color: #475d62; font-size: 0.75rem; line-height: 1.4; }
-.eventList time { flex: none; color: #879397; font-size: 0.66rem; }
-.emptyUpdates { margin: 15px 0 0; color: #839095; font-size: 0.75rem; }
+.screen { --journey-bleed: clamp(22px, 7.2vw, 32px); --journey-inset: clamp(22px, 5.7vw, 32px); width: 100%; }
+.mapScene { position: relative; isolation: isolate; width: calc(100% + 2 * var(--journey-bleed)); height: 350px; margin-inline: calc(-1 * var(--journey-bleed)); overflow: hidden; background: #d8d8d8; }
+.mapCanvas { position: absolute; inset: 0 0 36px; }
+.pageHeader { position: relative; z-index: 1; width: min(calc(100% - 2 * var(--journey-bleed)), 1120px); display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; align-items: center; gap: 14px; margin-inline: auto; padding-top: 22px; }
+.backLink { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; text-decoration: none; }
+.backLink:hover { background: rgba(255, 255, 255, 0.55); }
+.backLink img { display: block; transform: rotate(180deg); }
+.visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); border: 0; }
+.flowMark { display: block; justify-self: end; align-self: start; grid-column: 3; }
+.flowMark img { display: block; }
+@media (min-width: 761px) { .flowMark { display: none; } }
 
-@media (max-width: 900px) {
-  .journeyHero { grid-template-columns: 1fr; }
-  .progressVisual { min-height: 130px; }
-  .journeyGrid { grid-template-columns: 1fr; }
-  .sideColumn { grid-template-columns: 1fr 1fr; }
+.journeySheet { position: relative; z-index: 2; width: calc(100% + 2 * var(--journey-bleed)); margin: -28px calc(-1 * var(--journey-bleed)) 0; padding: 48px var(--journey-inset) 28px; border-radius: 56px 56px 0 0; background: linear-gradient(135deg, #f5e5e1 0%, #f2ebd4 100%); box-shadow: 0 -12px 34px rgba(30, 30, 30, 0.08); }
+.sheetHandle { position: absolute; top: 13px; left: 50%; display: block; transform: translateX(-50%); }
+.sheetContent { width: min(100%, 760px); margin-inline: auto; }
+.nextCard { padding: 20px 28px 13px; border: 0; border-radius: 30px; background: rgba(255, 255, 255, 0.73); box-shadow: 0 10px 27px rgba(93, 83, 72, 0.12); }
+.nextEyebrow { margin: 0 0 7px; color: #737373; font-size: 15px; }
+.nextCard h2 { margin: 0; color: #101926; font-size: 19px; font-weight: 500; letter-spacing: -0.025em; }
+.nextMeta { margin: 5px 0 0; color: #777; font-size: 13px; }
+.nextActions { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; padding-top: 10px; border-top: 1px solid #dfdbd4; }
+.nextActions a { min-height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0 17px; border: 1px solid #ff907b; border-radius: 999px; background: white; color: #f16d55; font-size: 13px; font-weight: 500; text-decoration: none; }
+.nextActions a:hover { background: #fff5f2; }
+.nextActions a + a { border-color: transparent; background: transparent; }
+
+.journeyLabel { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 31px 4px 10px; color: #101926; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; }
+.progressCount { color: #717171; font-size: 11px; letter-spacing: 0; text-transform: none; }
+.timelinePanel { padding: 8px 26px; border: 0; border-radius: 30px; background: rgba(255, 255, 255, 0.72); box-shadow: 0 10px 27px rgba(93, 83, 72, 0.12); }
+.timeline { display: grid; }
+.timelineStep { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 15px; padding: 16px 0; border-bottom: 1px solid #dedbd4; }
+.timelineStep:last-child { border-bottom: 0; }
+.modeBadge { position: relative; width: 40px; height: 40px; display: grid; place-items: center; }
+.badgeArtwork { position: absolute; top: 0; left: 0; display: block; }
+.modeGlyph { position: relative; z-index: 1; display: block; }
+.modeGlyphRaster { position: relative; z-index: 1; width: 22px; height: 22px; display: block; object-fit: contain; }
+.modeInitial { position: relative; z-index: 1; color: #101926; font-size: 15px; font-weight: 600; }
+.timelineContent { min-width: 0; }
+.segmentHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.segmentName { min-width: 0; }
+.segmentName h3 { margin: 0; color: #101926; font-size: 18px; font-weight: 500; letter-spacing: -0.025em; }
+.segmentName p { margin: 3px 0 0; color: #737373; font-size: 13px; }
+.stepStatus { display: inline-flex; flex: none; align-items: center; gap: 5px; font-size: 13px; white-space: nowrap; }
+.stepStatus img { display: block; }
+.completed { color: #136507; }
+.ongoing { color: #d78c00; }
+.upcoming { color: #0064d7; }
+.segmentTime { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 7px 0 0; color: #777; font-size: 12px; line-height: 1.45; }
+.dayRollover { padding: 2px 7px; border-radius: 999px; background: #f6e8c8; color: #8e6434; font-size: 11px; font-weight: 600; }
+.segmentNote { margin: 7px 0 0; color: #737373; font-size: 12px; line-height: 1.4; }
+.emptyTimeline { margin: 14px 0; color: #737373; font-size: 14px; }
+.manualNote { max-width: 620px; margin: 12px 5px 0; color: #737373; font-size: 12px; line-height: 1.5; }
+.actionPanel { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 17px; }
+.actionPanel > button,
+.actionPanel > a { min-height: 58px; flex: 1 1 200px; font-weight: 500; }
+.actionPanel > p { width: 100%; margin: 0; }
+.delayForm { display: grid; gap: 14px; margin-top: 16px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 24px; background: rgba(255, 255, 255, 0.65); }
+.delayForm h2 { margin: 0; color: #101926; font-size: 18px; font-weight: 500; }
+.delayForm > p { margin: -7px 0 0; color: #737373; font-size: 13px; line-height: 1.45; }
+.delayFields { display: grid; grid-template-columns: minmax(130px, 0.55fr) minmax(0, 1fr); gap: 12px; }
+.delayForm button { justify-self: start; font-weight: 500; }
+.footerLinks { display: flex; flex-wrap: wrap; justify-content: center; gap: 17px; margin: 17px 0 0; }
+.footerLinks a { color: #e96548; font-size: 13px; font-weight: 500; text-decoration: none; }
+.footerLinks a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (min-width: 960px) {
+  .mapScene { height: 390px; }
+  .journeySheet { width: min(100%, 1060px); margin: -36px auto 0; padding: 48px 36px 34px; border-radius: 48px; }
+  .sheetContent { width: 100%; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: start; gap: 14px 24px; }
+  .nextCard { grid-column: 1; grid-row: 1; }
+  .journeyLabel { grid-column: 2; grid-row: 1; align-self: start; margin: 4px 4px 0; }
+  .timelinePanel { grid-column: 2; grid-row: 1 / span 3; align-self: start; margin-top: 38px; }
+  .manualNote,
+  .actionPanel,
+  .delayForm { grid-column: 1; }
+  .manualNote { grid-row: 2; }
+  .actionPanel { grid-row: 3; }
+  .delayForm { grid-row: 4; }
+  .footerLinks { grid-column: 1 / -1; }
+}
+
+@media (min-width: 761px) {
+  .screen { --journey-bleed: clamp(32px, 4.7vw, 72px); }
+}
+
+@media (max-width: 760px) {
+  .screen { margin-top: -32px; }
+  .pageHeader { padding-top: 32px; }
 }
 
 @media (max-width: 620px) {
-  .journeyHero { padding: 23px 19px; }
-  .sideColumn { grid-template-columns: 1fr; }
-  .timelinePanel { padding: 19px 15px; }
-  .timelineTop { flex-direction: column; gap: 5px; }
+  .mapScene { height: 276px; }
+  .mapCanvas { bottom: 0; }
+  .pageHeader { grid-template-columns: 42px minmax(0, 1fr) 38px; gap: 12px; padding-top: 32px; }
+  .journeySheet { margin-top: -1px; padding-top: 51px; border-radius: 56px 56px 0 0; }
+  .nextCard { padding: 19px 22px 12px; }
+  .journeyLabel { margin-top: 31px; }
+  .timelinePanel { padding-inline: 22px; }
+  .segmentName h3 { font-size: 17px; }
+  .segmentName p { font-size: 12px; }
+  .stepStatus { font-size: 12px; }
+  .actionPanel { display: grid; }
+  .actionPanel > button,
+  .actionPanel > a { width: 100%; }
   .delayFields { grid-template-columns: 1fr; }
+  .delayForm button { width: 100%; }
+}
+
+@media (max-width: 390px) {
+  .timelinePanel { padding-inline: 16px; }
+  .timelineStep { grid-template-columns: 38px minmax(0, 1fr); gap: 11px; }
+  .modeBadge { width: 38px; height: 38px; }
+  .segmentHeading { align-items: flex-start; flex-direction: column; gap: 5px; }
 }

@@ -1,0 +1,41 @@
+.successCard {
+  display: grid;
+  justify-items: start;
+  gap: 15px;
+  padding: clamp(28px, 6vw, 52px);
+}
+
+.successMark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e6edde;
+  color: #476240;
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+
+.successCard .eyebrow { margin: 7px 0 -7px; }
+.successCard .pageIntro { margin: -3px 0 0; }
+
+.bookingNote {
+  margin: 0;
+  color: #6d7571;
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 7px;
+}
+
+@media (max-width: 520px) {
+  .successCard { gap: 13px; padding: 24px; }
+  .actions { width: 100%; flex-direction: column; }
+  .actions a { width: 100%; }
+}

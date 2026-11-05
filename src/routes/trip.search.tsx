@@ -1,8 +1,10 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
+import TripMap from '../components/TripMap'
+import CitySearch from '../components/CitySearch'
 import { createTrip, getCurrentUser } from '../server/functions'
-import { getDestinationsFor, getRouteEstimates, locations } from '../server/route-catalog'
+import type { City } from '../server/cities'
 import styles from './trip-search.module.css'
 import app from '../styles/app.module.css'
 
@@ -16,14 +18,14 @@ export const Route = createFileRoute('/trip/search')({
 
 function TripSearchPage() {
   const navigate = useNavigate()
-  const [origin, setOrigin] = useState('GGM')
-  const [destination, setDestination] = useState('JAI')
+  const [origin, setOrigin] = useState<City | null>(null)
+  const [destination, setDestination] = useState<City | null>(null)
+  const [prompt, setPrompt] = useState('')
+  const [tripDays, setTripDays] = useState(2)
   const [today, setToday] = useState('')
   const [departureDate, setDepartureDate] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const destinations = getDestinationsFor(origin)
-  const routeCount = getRouteEstimates(origin, destination).length
 
   useEffect(() => {
     setToday(localDate(0))
@@ -32,14 +34,17 @@ function TripSearchPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (!origin || !destination) { setError('Select both cities from the search results.'); return }
     setError('')
     setBusy(true)
     const form = new FormData(event.currentTarget)
     try {
       const result = await createTrip({
         data: {
-          originCode: origin,
-          destinationCode: destination,
+          originCode: origin.code,
+          destinationCode: destination.code,
+          prompt,
+          tripDays,
           departureDate: String(form.get('departureDate') ?? ''),
           departureTime: String(form.get('departureTime') ?? ''),
           travelers: Number(form.get('travelers')),
@@ -53,88 +58,69 @@ function TripSearchPage() {
     }
   }
 
-  function changeOrigin(code: string) {
-    const nextDestinations = getDestinationsFor(code)
-    setOrigin(code)
-    setDestination(nextDestinations[0]?.code ?? '')
-  }
-
   return (
-    <AppLayout active="home">
-      <div className={app.contentWrap}>
-        <div className={styles.pageHeadingRow}>
-          <div className={styles.heading}>
-            <p className={app.eyebrow}>From Sector 65, Gurugram</p>
-            <h1 className={app.pageHeading}>Where to?</h1>
-            <p className={app.pageIntro}>Choose your destination and travel date. We’ll bring the route options together.</p>
-          </div>
-          <img className={styles.routeArt} src="/assets/figma/home-route-artwork.svg" width="464" height="167" alt="" />
-        </div>
-
-        <div className={styles.searchLayout}>
-          <form className={`${app.panel} ${styles.searchForm}`} onSubmit={submit}>
-            <div className={styles.locationFields}>
-              <label className={app.field}>
-                <span className={app.fieldLabel}>Leaving from</span>
-                <select className={app.fieldControl} value={origin} onChange={(event) => changeOrigin(event.currentTarget.value)}>
-                  {locations.filter((location) => getDestinationsFor(location.code).length > 0).map((location) => (
-                    <option value={location.code} key={location.code}>{location.name}</option>
-                  ))}
-                </select>
-              </label>
-              <span className={styles.locationConnector} aria-hidden="true" />
-              <label className={app.field}>
-                <span className={app.fieldLabel}>Going to</span>
-                <select className={app.fieldControl} value={destination} onChange={(event) => setDestination(event.currentTarget.value)}>
-                  {destinations.map((location) => <option value={location.code} key={location.code}>{location.name}</option>)}
-                </select>
-              </label>
+    <AppLayout active="plan" mobileHeader="map" mobileNavigation={false} location={origin?.name}>
+      <div className={app.wideWrap}>
+        <div className={styles.destinationScreen}>
+          <section className={styles.mapHero} aria-label="Journey map">
+            <div className={styles.mapCanvas}>
+              <TripMap originCity={origin ?? undefined} destinationCity={destination ?? undefined} />
             </div>
+          </section>
 
-            <div className={styles.tripFields}>
-              <label className={app.field}>
-                <span className={app.fieldLabel}>Travel date</span>
-                <input className={app.fieldControl} type="date" name="departureDate" min={today} value={departureDate} onChange={(event) => setDepartureDate(event.currentTarget.value)} required />
-              </label>
-              <label className={app.field}>
-                <span className={app.fieldLabel}>Leave around</span>
-                <input className={app.fieldControl} type="time" name="departureTime" defaultValue="09:00" required />
-              </label>
-              <label className={app.field}>
-                <span className={app.fieldLabel}>Travelers</span>
-                <select className={app.fieldControl} name="travelers" defaultValue="1">
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => <option value={count} key={count}>{count} {count === 1 ? 'traveler' : 'travelers'}</option>)}
-                </select>
-              </label>
-            </div>
+          <form className={`${app.panel} ${styles.wherePanel}`} onSubmit={submit} onInvalidCapture={(event) => {
+            const settings = (event.target as HTMLElement).closest('details')
+            if (settings) settings.open = true
+          }}>
+            <header className={styles.panelHeading}>
+              <h1>Where to?</h1>
+              <p>Pick your cities. Tell Velo what matters to you.</p>
+            </header>
 
-            {routeCount === 0 && <p className={app.errorNotice}>There are no route estimates for this city pair yet.</p>}
-            {error && <p className={app.errorNotice} role="alert">{error}</p>}
+            <CitySearch label="Leaving from" value={origin} onChange={setOrigin} />
+            <CitySearch label="Going to" value={destination} onChange={setDestination} />
+            <label className={styles.promptField}>
+              <span><img src="/assets/home-sparkle.svg" width="22" height="22" alt="" /> Plan with Velo</span>
+              <textarea value={prompt} onChange={(event) => setPrompt(event.currentTarget.value)} maxLength={2000} rows={4} placeholder="A relaxed 3-day trip under ₹8,000 each. Prefer trains, local food and places that aren't too crowded." />
+            </label>
+            <label className={styles.compactField}><span className={styles.controlLabel}>Days away</span><input aria-label="Days away" type="number" min="1" max="14" required value={tripDays} onChange={(event) => setTripDays(Number(event.currentTarget.value))} /></label>
+            <p className={styles.dataCredit}>City data: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
+
             <div className={styles.submitRow}>
-              <p>Route prices are estimates. No ticket is booked or charged.</p>
-              <button type="submit" className={app.buttonPrimary} disabled={busy || routeCount === 0}>
-                {busy ? 'Saving trip' : 'Plan my journey'} <span aria-hidden="true">↗</span>
+              <details className={styles.scheduleSettings}>
+                <summary aria-label="Edit travel date, departure time and travelers"><img src="/assets/where-to/calendar.svg" alt="" /><span className={styles.srOnly}>Travel details</span></summary>
+                <div className={styles.schedulePopover}>
+                  <h2>Travel details</h2>
+                  <div className={styles.tripFields}>
+              <label className={styles.dateField}>
+                <span className={styles.calendarBadge} aria-hidden="true">
+                  <img src="/assets/where-to/calendar.svg" alt="" />
+                </span>
+                <span><span className={styles.controlLabel}>Travel date</span>
+                  <input type="date" name="departureDate" min={today} value={departureDate} onChange={(event) => setDepartureDate(event.currentTarget.value)} required />
+                </span>
+              </label>
+              <label className={styles.compactField}>
+                <span className={styles.controlLabel}>Leave around</span>
+                <input type="time" name="departureTime" defaultValue="09:00" required />
+              </label>
+              <label className={styles.compactField}>
+                <span className={styles.controlLabel}>Travelers</span>
+                <select name="travelers" defaultValue="1" aria-label="Travelers">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => <option value={count} key={count}>{count}</option>)}
+                </select>
+              </label>
+                  </div>
+                  <button type="button" onClick={(event) => { event.currentTarget.closest('details')!.open = false }}>Done</button>
+                </div>
+              </details>
+
+            {error && <p className={app.errorNotice} role="alert">{error}</p>}
+              <button type="submit" className={app.buttonPrimary} disabled={busy || !origin || !destination}>
+                {busy ? 'Velo is planning...' : 'Plan my journey'} <span aria-hidden="true">↗</span>
               </button>
             </div>
           </form>
-
-          <aside className={styles.recentPanel}>
-            <div className={styles.recentHeading}>
-              <h2>Recent destinations</h2>
-              <span>Choose one</span>
-            </div>
-            <div className={styles.destinationList}>
-              <button className={styles.destinationCard} type="button" onClick={() => setDestination('JAI')}>
-                <img src="/assets/figma/recent-destination-jaipur.png" width="77" height="59" alt="" />
-                <span><strong>Jaipur</strong><small>{origin === 'GGM' ? 'Gurugram to Jaipur' : 'Select Jaipur'}</small></span>
-              </button>
-              <button className={styles.destinationCard} type="button" onClick={() => setDestination('MAY')}>
-                <img src="/assets/figma/recent-destination-mayapur.png" width="77" height="59" alt="" />
-                <span><strong>Mayapur</strong><small>{origin === 'GGM' ? 'Gurugram to Mayapur' : 'Select Mayapur'}</small></span>
-              </button>
-            </div>
-            <p className={styles.catalogNote}>Flow’s route catalog has planning estimates, not live schedules.</p>
-          </aside>
         </div>
       </div>
     </AppLayout>
@@ -143,6 +129,9 @@ function TripSearchPage() {
 
 function localDate(offsetDays: number) {
   const date = new Date()
-  date.setUTCDate(date.getUTCDate() + offsetDays)
-  return date.toISOString().slice(0, 10)
+  date.setDate(date.getDate() + offsetDays)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }

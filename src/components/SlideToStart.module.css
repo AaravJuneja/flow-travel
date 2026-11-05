@@ -1,0 +1,7 @@
+.track { position: relative; width: 100%; min-height: 74px; display: flex; align-items: center; justify-content: center; padding: 0 60px 0 78px; overflow: hidden; border: 0; border-radius: 999px; background: #ff72515e; color: white; font-size: 1.55rem; font-weight: 500; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; transition: background 150ms ease; }
+.track:hover { background: #ff725190; }
+.label { pointer-events: none; }
+.thumb { position: absolute; left: 0; top: 0; width: 74px; height: 74px; display: grid; place-items: center; border-radius: 50%; background: #ff907b; transform: translateX(var(--slide-distance, 0px)); transition: transform 180ms ease-out; cursor: grab; }
+.dragging .thumb { transition: none; cursor: grabbing; }
+.track:disabled { cursor: progress; }
+@media (prefers-reduced-motion: reduce) { .track, .thumb { transition: none; } }

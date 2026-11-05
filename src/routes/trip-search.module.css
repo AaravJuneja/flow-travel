@@ -1,10 +1,488 @@
-.heading { margin-bottom: 27px; }
-.searchForm { display: grid; gap: 22px; padding: clamp(20px, 4.2vw, 34px); }
-.submitRow { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 2px; }
-.submitRow p { max-width: 310px; margin: 0; color: #79868a; font-size: 0.75rem; line-height: 1.45; }
+.destinationScreen {
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(460px, 1fr);
+  align-items: stretch;
+  gap: clamp(18px, 2.5vw, 34px);
+}
 
-@media (max-width: 560px) {
-  .searchForm { gap: 18px; padding: 19px; }
-  .submitRow { align-items: stretch; flex-direction: column; }
-  .submitRow .buttonPrimary { width: 100%; }
+.citySearch { position: relative; min-width: 0; }
+.citySearch > label { display: block; margin: 0 0 7px 5px; font-size: .82rem; color: #626660; }
+.cityInput { display: flex; align-items: center; gap: 10px; padding: 15px; border: 1px solid #fff; border-radius: 20px; background: #ffffffbd; }
+.cityInput:focus-within { outline: 2px solid #ff907b; }
+.cityInput input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: #101926; font: inherit; }
+.cityResults { position: absolute; z-index: 8; top: 82px; left: 0; right: 0; max-height: 260px; overflow-y: auto; padding: 7px; border: 1px solid #eee5dc; border-radius: 18px; background: #fffdf8; box-shadow: 0 12px 28px #10192622; }
+.cityResults button { display: grid; gap: 4px; width: 100%; padding: 12px; border: 0; border-radius: 12px; background: transparent; text-align: left; color: #101926; cursor: pointer; }
+.cityResults button:hover, .cityResults button:focus-visible { background: #ffebe3; outline: 2px solid #ff907b; outline-offset: -2px; }
+.cityResults p { padding: 8px; font-size: .85rem; }
+.cityResults small, .selectedCity small { display: block; color: #73766e; font-size: .75rem; }
+.selectedCity { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 10px; border-radius: 16px; background: #ffffff80; }
+.selectedCity > img { flex-shrink: 0; object-fit: cover; border-radius: 10px; }
+.selectedCity > div { min-width: 0; }
+.selectedCity a { display: block; max-width: 100%; margin-top: 4px; overflow-wrap: anywhere; color: #6f716a; font-size: .62rem; }
+.promptField { display: grid; gap: 10px; }
+.promptField > span { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.promptField textarea { box-sizing: border-box; resize: vertical; min-width: 0; width: 100%; min-height: 108px; padding: 15px; border: 1px solid white; border-radius: 20px; background: #ffffffb8; color: #101926; font: inherit; font-size: .9rem; line-height: 1.5; }
+.promptField textarea:focus { outline: 2px solid #ff907b; }
+.dataCredit { margin: 0; font-size: .68rem; color: #73766e; }
+.dataCredit a { color: inherit; }
+
+.mapHero {
+  position: relative;
+  height: clamp(520px, 68svh, 700px);
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #dededb;
+  isolation: isolate;
+}
+
+.mapCanvas {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+}
+
+.mapCanvas > * {
+  width: 100%;
+  height: 100%;
+}
+
+.mapHero::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(250, 249, 245, 0.12), transparent 45%, rgba(16, 25, 38, 0.02));
+  pointer-events: none;
+  content: '';
+}
+
+.mapTopbar {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.mapLogo {
+  display: block;
+}
+
+
+.wherePanel {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 19px;
+  padding: clamp(24px, 3vw, 38px);
+  border-color: rgba(255, 255, 255, 0.74);
+  border-radius: 30px;
+  background: linear-gradient(145deg, rgba(250, 230, 224, 0.82), rgba(248, 242, 220, 0.88) 75%);
+  box-shadow: 0 10px 28px rgba(93, 83, 72, 0.09);
+}
+
+.panelHeading { text-align: center; }
+
+.panelHeading h1 {
+  margin: 0;
+  color: #101926;
+  font-size: clamp(1.75rem, 3vw, 2.05rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.panelHeading p {
+  max-width: 390px;
+  margin: 7px auto 0;
+  color: #747474;
+  font-size: 0.91rem;
+  line-height: 1.45;
+}
+
+.destinationSearch {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 0 7px;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 7px 22px rgba(82, 71, 66, 0.1);
+}
+
+.destinationSearch:focus-within {
+  border-color: rgba(255, 114, 81, 0.56);
+  outline: 3px solid rgba(255, 114, 81, 0.14);
+}
+
+.searchSparkles {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  flex: 0 0 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(56, 48, 45, 0.1);
+}
+
+.searchSparkles img:first-child { display: block; }
+
+.searchSparkles img:last-child {
+  position: absolute;
+  top: 10px;
+  right: 9px;
+}
+
+.destinationSearch input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #101926;
+  font: inherit;
+  font-size: 0.93rem;
+  text-align: center;
+}
+
+.destinationSearch input::placeholder { color: #999; opacity: 1; }
+
+.locationCard {
+  padding: 4px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 23px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 8px 24px rgba(82, 71, 66, 0.1);
+}
+
+.locationRow {
+  min-height: 61px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #101926;
+  text-decoration: none;
+}
+
+.locationRow > img { flex: 0 0 auto; }
+
+.locationRow > div,
+.destinationField {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.locationRow > div > span,
+.destinationField > span {
+  color: #8a8c8b;
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+
+.locationRow strong,
+.destinationField select {
+  color: #101926;
+  font-size: 0.91rem;
+  font-weight: 500;
+}
+
+.locationDivider {
+  height: 1px;
+  margin-left: 35px;
+  background: rgba(16, 25, 38,  0.13);
+}
+
+.destinationField select {
+  width: 100%;
+  padding: 0 24px 0 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.recentHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: -10px;
+}
+
+.recentHeading h2 {
+  margin: 0;
+  color: #101926;
+  font-size: 0.86rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.recentHeading > span {
+  color: #747474;
+  font-size: 0.72rem;
+}
+
+.destinationList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.destinationCard {
+  min-width: 0;
+  min-height: 79px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 6px 18px rgba(82, 71, 66, 0.09);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.destinationCard:hover { border-color: #f2a18d; }
+
+.destinationCard:focus-visible {
+  outline: 3px solid rgba(255, 114, 81, 0.32);
+  outline-offset: 2px;
+}
+
+.destinationCardSelected {
+  border-color: rgba(255, 114, 81, 0.8);
+  background: rgba(255, 247, 243, 0.86);
+}
+
+.destinationCard > img {
+  width: 77px;
+  height: 59px;
+  flex: 0 0 77px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.destinationCard > span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.destinationCard strong {
+  color: #101926;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.destinationCard small {
+  color: #818181;
+  font-size: 0.69rem;
+  line-height: 1.3;
+}
+
+.noDestinations {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 13px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  color: #656c69;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.tripFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(105px, 0.9fr) minmax(76px, 0.65fr);
+  gap: 9px;
+}
+
+.dateField,
+.compactField {
+  min-width: 0;
+  min-height: 63px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.calendarBadge {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.calendarBadge img { display: block; }
+
+.dateField > span:last-child,
+.compactField { min-width: 0; }
+
+.compactField {
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.controlLabel {
+  display: block;
+  color: #818783;
+  font-size: 0.67rem;
+  font-weight: 500;
+}
+
+.dateField input,
+.compactField input,
+.compactField select {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #101926;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.dateField input:focus-visible,
+.compactField input:focus-visible,
+.compactField select:focus-visible,
+.destinationField select:focus-visible {
+  outline: 2px solid #ff7251;
+  outline-offset: 3px;
+}
+
+.submitRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 74px minmax(0,1fr);
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
+  padding-top: 0;
+}
+
+.submitRow p {
+  grid-column: 1 / -1;
+  max-width: 360px;
+  margin: 0;
+  color: #777e7c;
+  font-size: 0.73rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.submitRow > button {
+  width: 100%;
+  min-height: 66px;
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+.scheduleSettings { position: static; justify-self: start; }
+.scheduleSettings > summary { width: 74px; height: 74px; display: grid; place-items: center; border-radius: 50%; background: #ffffffb3; cursor: pointer; list-style: none; }
+.scheduleSettings > summary::-webkit-details-marker { display: none; }
+.scheduleSettings[open] > summary { background: #f4d6ca; }
+.schedulePopover { position: absolute; z-index: 5; left: 0; right: 0; bottom: 85px; padding: 22px; border: 1px solid white; border-radius: 24px; background: #fbf8f1; box-shadow: 0 8px 35px #10192626; }
+.schedulePopover h2 { margin: 0 0 18px; font-size: 1.2rem; font-weight: 500; }
+.schedulePopover .tripFields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.schedulePopover .dateField { grid-column: 1 / -1; }
+.schedulePopover input, .schedulePopover select { font-size: .9rem; }
+.schedulePopover > button { width: 100%; min-height: 42px; margin-top: 16px; border: 0; border-radius: 999px; background: #ff907b; color: white; cursor: pointer; }
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 1040px) {
+  .destinationScreen { grid-template-columns: minmax(0, 0.8fr) minmax(420px, 1fr); gap: 20px; }
+  .mapHero { height: clamp(520px, 68svh, 660px); }
+  .wherePanel { gap: 17px; padding: 24px; }
+  .destinationCard { gap: 8px; padding: 7px; }
+  .destinationCard > img { width: 58px; height: 50px; flex-basis: 58px; }
+  .tripFields { grid-template-columns: minmax(0, 1.2fr) minmax(92px, 0.8fr) minmax(68px, 0.55fr); gap: 7px; }
+}
+
+@media (max-width: 900px) {
+  .destinationScreen { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .mapHero { height: clamp(280px, 43vw, 350px); border-radius: 28px 28px 0 0; }
+  .mapTopbar { top: 16px; right: 16px; }
+  .wherePanel { gap: 18px; padding: clamp(24px, 4vw, 34px); border-radius: 30px; }
+  .panelHeading h1 { font-size: clamp(1.8rem, 5vw, 2.1rem); }
+  .destinationCard { gap: 10px; padding: 8px; }
+  .destinationCard > img { width: 77px; height: 59px; flex-basis: 77px; }
+  .tripFields { grid-template-columns: minmax(0, 1.3fr) minmax(105px, 0.9fr) minmax(76px, 0.65fr); gap: 9px; }
+}
+
+@media (max-width: 760px) {
+  .mapHero { border-radius: 0; }
+  .mapCanvas { bottom: 25px; }
+  .wherePanel { position: relative; z-index: 1; margin-top: -25px; }
+}
+
+@media (max-width: 520px) {
+  .mapHero { height: clamp(280px, 68vw, 340px); }
+  .mapTopbar { top: 14px; right: 14px; }
+  .wherePanel { gap: 16px; padding: 31px 19px 26px; border-radius: 48px 48px 28px 28px; }
+  .panelHeading h1 { font-size: 1.65rem; }
+  .panelHeading p { margin-top: 5px; font-size: 0.86rem; }
+  .destinationSearch { min-height: 58px; gap: 8px; padding-right: 12px; }
+  .searchSparkles { width: 56px; height: 56px; flex-basis: 56px; }
+  .destinationSearch input { font-size: 0.85rem; }
+  .locationCard { padding-inline: 14px; }
+  .locationCard { margin-top: 24px; }
+  .locationRow { min-height: 59px; }
+  .recentHeading h2 { font-size: 0.79rem; letter-spacing: 0.12em; }
+  .recentHeading > span { font-size: 0.67rem; }
+  .destinationList { display: flex; gap: 12px; overflow-x: auto; padding: 1px 1px 15px; margin-bottom: -15px; scroll-snap-type: x proximity; }
+  .destinationCard { flex: 0 0 clamp(168px,40vw,190px); scroll-snap-align: start; }
+  .destinationCard { min-height: 79px; flex-direction: row; align-items: center; gap: 8px; padding: 7px; border-radius: 19px; }
+  .destinationCard > img { width: 77px; height: 59px; flex-basis: 77px; }
+  .destinationCard > span { padding: 0; }
+  .destinationCard strong { font-size: 0.83rem; }
+  .destinationCard small { font-size: 0.64rem; }
+  .tripFields { grid-template-columns: minmax(0, 1.2fr) minmax(87px, 0.9fr) minmax(68px, 0.62fr); gap: 6px; }
+  .dateField,
+  .compactField { min-height: 60px; gap: 6px; padding: 7px; border-radius: 15px; }
+  .calendarBadge { width: 36px; height: 36px; flex-basis: 36px; }
+  .controlLabel { font-size: 0.62rem; }
+  .dateField input,
+  .compactField input,
+  .compactField select { font-size: 0.69rem; }
+  .submitRow { gap: 8px; }
+  .submitRow p { font-size: 0.7rem; }
+  .submitRow > button { width: 100%; min-height: 66px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .destinationCard { transition: none; }
 }

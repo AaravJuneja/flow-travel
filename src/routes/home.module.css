@@ -1,71 +1,52 @@
-.welcome {
-  position: relative;
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  padding: clamp(28px, 5.5vw, 60px);
-  border: 1px solid rgba(45, 77, 74, 0.1);
-  border-radius: 24px;
-  background: #e5eee4;
-}
-
-.welcomeCopy { position: relative; z-index: 1; width: min(100%, 540px); }
-.welcomeCopy .buttonPrimary { margin-top: 24px; }
-
-.routeSketch {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 48%;
-  height: 100%;
-  background-image: repeating-linear-gradient(154deg, transparent 0 39px, rgba(65, 117, 97, 0.08) 40px 41px, transparent 42px 68px);
-  mask-image: linear-gradient(90deg, transparent, #000 38%);
-}
-
-.routeSketch svg { position: absolute; inset: 13% 5% 8% 0; width: 100%; height: 80%; overflow: visible; }
-.routeSketch circle { fill: #f3f4ed; stroke: #167b78; stroke-width: 4; }
-.sketchRoad { stroke: rgba(71, 117, 99, 0.24); stroke-width: 18; stroke-linecap: round; }
-.sketchRoute { stroke: #167b78; stroke-width: 3; stroke-dasharray: 2 9; stroke-linecap: round; }
-.sketchLabel { position: absolute; right: 16%; bottom: 16%; color: #648078; font-size: 0.7rem; font-weight: 700; }
-
-.tripsSection { margin-top: 48px; }
-.sectionTop { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
-.tripList { display: grid; gap: 12px; }
-
-.tripRow {
-  min-height: 90px;
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 18px;
-  padding: 17px 19px;
-}
-
-.tripRouteMark { position: relative; width: 24px; height: 33px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-.tripRouteMark::before { position: absolute; top: 4px; bottom: 4px; width: 1px; border-left: 1px dashed #99bcb0; content: ''; }
-.tripRouteMark span { position: relative; z-index: 1; width: 9px; height: 9px; border: 2px solid #fffefa; border-radius: 50%; background: var(--flow-teal); box-shadow: 0 0 0 1px #8cae9f; }
-.tripRouteMark span:last-child { background: var(--flow-coral); box-shadow: 0 0 0 1px #ce9a83; }
-.tripInformation h3 { margin: 0; color: var(--flow-ink); font-size: 1rem; font-weight: 700; letter-spacing: -0.025em; }
-.tripInformation p { margin: 5px 0 0; color: #78868a; font-size: 0.76rem; }
-.emptyState { min-height: 220px; display: grid; justify-items: center; align-content: center; padding: 30px; text-align: center; }
-.emptyIcon { color: var(--flow-teal); font-size: 2.3rem; line-height: 1; }
-.emptyState h3 { margin: 12px 0 5px; font-size: 1.1rem; font-weight: 700; }
-.emptyState p { max-width: 350px; margin: 0 0 18px; color: var(--flow-muted); font-size: 0.86rem; line-height: 1.5; }
-
+.welcome { position: relative; min-height: 390px; display: flex; align-items: flex-start; padding-top: 28px; isolation: isolate; }
+.welcomeCopy { width: min(100%, 540px); position: relative; z-index: 1; }
+.greeting { margin: 0; font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 300; line-height: 1.3; }
+.welcomeCopy h1 { font-size: clamp(2.4rem, 4vw, 3.6rem); font-weight: 500; letter-spacing: -.04em; line-height: 1.15; }
+.searchLink { display: flex; align-items: center; gap: 22px; width: 100%; min-height: 58px; margin-top: 30px; border-radius: 100px; background: rgba(255,255,255,.75); color: #989695; font-size: 1.15rem; font-weight: 300; text-decoration: none; box-shadow: 0 10px 28px rgba(93,83,72,.17); }
+.searchLink:hover { background: white; }
+.searchIcon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,.7); box-shadow: 0 5px 20px #71635912; }
+.routeSketch { position: absolute; z-index: -1; right: 0; top: 60px; width: 48%; height: 230px; display: grid; place-items: center; overflow: hidden; }
+.routeSketch img { flex: none; transform: rotate(-5.18deg); }
+.tripsSection { margin-top: 0; }
+.sectionTop { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.sectionTop h2 { font-size: .95rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; }
+.tripList { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.tripRow { min-width: 0; padding: 24px 27px 18px; border: 0; border-radius: 30px; }
+.tripInformation h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0; font-size: clamp(1.15rem,2vw,1.4rem); font-weight: 500; letter-spacing: -.035em; }
+.tripInformation h3 span { font-size: 1.65rem; line-height: 1; }
+.tripInformation p { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; color: #848484; font-size: .85rem; font-weight: 400; }
+.tripFare { display: inline-flex; gap: 12px; margin-left: auto; }
+.transportRoute { position: relative; display: flex; align-items: center; justify-content: space-between; margin: 28px 0 16px; }
+.transportRoute::before { content: ''; position: absolute; top: 50%; left: 20px; right: 20px; border-top: 1px solid #c5c5c5; }
+.transportRoute:has(.transportStop:only-child)::before { display: none; }
+.transportStop { position: relative; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: #f3d9d2; box-shadow: 0 0 0 6px #f9f8f4; }
+.transportStop:has(img[alt='Train']) { background: #ede6c8; }
+.tripFooter { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; }
+.tripFooter > a { min-height: 35px; padding: 0 12px; font-size: .76rem; font-weight: 500; }
+.tripFooter > span { font-weight: 500; }
+.emptyState { min-height: 177px; padding: 25px; border: 0; border-radius: 30px; }
+.emptyIcon { display: none; }
+.emptyState h3 { margin: 0 0 8px; font-size: 1.25rem; font-weight: 500; }
+.emptyState p { max-width: 500px; margin: 0 0 18px; color: #747474; font-size: .9rem; line-height: 1.5; }
+.inspiration { display: flex; align-items: flex-start; gap: 18px; margin-top: 20px; padding: 22px 24px; border: 0; border-radius: 30px; text-decoration: none; }
+.inspiration > img { flex: none; }
+.inspiration h2 { margin: 0; font-size: 1rem; font-weight: 400; }
+.inspiration p { max-width: 580px; margin: 7px 0 0; color: #888; font-size: .85rem; font-weight: 300; line-height: 1.35; }
+.inspiration > span { margin-left: auto; font-size: 1.8rem; line-height: .8; }
 @media (max-width: 760px) {
-  .welcome { min-height: 275px; padding: 28px 24px; border-radius: 19px; }
-  .routeSketch { right: -19%; width: 72%; opacity: 0.65; }
-  .tripRow { grid-template-columns: 28px minmax(0, 1fr) auto; gap: 11px; padding: 15px 13px; }
-  .tripRow > :last-child { grid-column: 2 / -1; justify-self: start; }
-  .tripInformation h3 { font-size: 0.91rem; }
-  .tripInformation p { line-height: 1.45; }
+  .welcome { min-height: 375px; padding-top: 20px; }
+  .welcomeCopy { width: 100%; }
+  .welcomeCopy h1 { font-size: 2.35rem; }
+  .routeSketch { width: calc(100% + 2 * clamp(22px,7.2vw,32px)); height: 210px; right: calc(-1 * clamp(22px,7.2vw,32px)); top: 133px; justify-content: center; }
+  .tripsSection { margin-top: 0; }
+  .tripList { grid-template-columns: 1fr; }
+  .tripRow { padding: 22px 26px 18px; }
+  .tripInformation h3 { font-size: 1.35rem; }
+  .tripInformation p { gap: 8px; font-size: .8rem; }
+  .tripFare { font-size: .75rem; }
+  .tripFooter { margin-top: 14px; }
 }
-
-@media (max-width: 440px) {
-  .sectionTop { align-items: start; }
-  .sectionTop > a { font-size: 0.73rem; }
-  .tripRow { grid-template-columns: 22px minmax(0, 1fr); }
-  .tripRow > .statusPill { grid-column: 2; }
-  .tripRow > :last-child { grid-column: 2; }
+@media (max-width: 380px) {
+  .tripRow { padding-inline: 19px; }
+  .tripFare { margin-left: 0; width: 100%; padding-left: 31px; }
 }

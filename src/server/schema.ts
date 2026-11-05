@@ -6,6 +6,7 @@ export const users = sqliteTable(
     id: text('id').primaryKey(),
     name: text('name').notNull(),
     email: text('email').notNull(),
+    passwordHash: text('password_hash'),
     createdAt: integer('created_at').notNull(),
   },
   (table) => [uniqueIndex('users_email_idx').on(table.email)],
@@ -36,6 +37,8 @@ export const trips = sqliteTable(
     travelers: integer('travelers').notNull().default(1),
     status: text('status').notNull().default('planning'),
     selectedOptionId: text('selected_option_id'),
+    plannerNotes: text('planner_notes').notNull().default(''),
+    plannerSources: text('planner_sources').notNull().default('[]'),
     createdAt: integer('created_at').notNull(),
     updatedAt: integer('updated_at').notNull(),
   },
@@ -54,6 +57,7 @@ export const routeOptions = sqliteTable(
     currency: text('currency').notNull(),
     changes: integer('changes').notNull(),
     summary: text('summary').notNull(),
+    details: text('details'),
     createdAt: integer('created_at').notNull(),
   },
   (table) => [index('route_options_trip_idx').on(table.tripId)],
@@ -124,3 +128,19 @@ export const paymentRecords = sqliteTable(
   },
   (table) => [index('payment_trip_idx').on(table.tripId)],
 )
+
+export const aiUsage = sqliteTable('ai_usage', {
+  key: text('key').primaryKey(),
+  requests: integer('requests').notNull().default(0),
+})
+
+export const routeResearch = sqliteTable('route_research', {
+  id: text('id').primaryKey(),
+  originCode: text('origin_code').notNull(),
+  destinationCode: text('destination_code').notNull(),
+  title: text('title').notNull(),
+  url: text('url').notNull(),
+  publisher: text('publisher').notNull(),
+  text: text('text').notNull(),
+  checkedAt: text('checked_at').notNull(),
+}, (table) => [index('research_city_pair_idx').on(table.originCode, table.destinationCode)])
