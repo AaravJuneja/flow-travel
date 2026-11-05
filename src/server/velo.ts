@@ -59,8 +59,13 @@ export function distanceKm(a: City, b: City) {
 
 const island = (city: City) => ['Andaman and Nicobar Islands', 'Lakshadweep'].includes(city.state)
 
-export async function generateVeloPlan(ai: AiRunner, input: { origin: City; destination: City; departureDate: string; departureTime: string; travelers: number; tripDays: number; prompt: string; context?: TravelContext[] }) {
-  let result: unknown
+type VeloInput = { origin: City; destination: City; departureDate: string; departureTime: string; travelers: number; tripDays: number; prompt: string; context?: TravelContext[] }
+
+class VeloDraftError extends Error {
+  constructor(message: string, readonly feedback: string) { super(message) }
+}
+
+export async function generateVeloPlan(ai: AiRunner, input: VeloInput) {
   const km = Math.round(distanceKm(input.origin, input.destination))
   const seaCrossing = input.origin.state !== input.destination.state && (island(input.origin) || island(input.destination))
   const content = [
@@ -71,6 +76,7 @@ export async function generateVeloPlan(ai: AiRunner, input: { origin: City; dest
     `Sea crossing required: ${seaCrossing ? 'yes' : 'not established'}.`,
     island(input.origin) || island(input.destination) ? 'At least one city is on an island. Check whether a ferry or flight is needed even within the same state.' : '',
     km < 150 ? 'Short trip: no Flight.' : '',
+    `Validation lower bounds, not fare quotes: a ground-only route must take at least ${Math.ceil(km / 110 * 60)} minutes. A vehicle route must cost at least INR ${km * 5} per vehicle. A per-traveler route must cost at least INR ${Math.ceil(km * 0.1)} per traveler. Any route with a flight must cost at least INR 1500. Use realistic estimates above these bounds, not the bounds as suggested prices.`,
     `Departure: ${input.departureDate} at ${input.departureTime}, India time.`,
     `Travelers: ${input.travelers}`,
     `Trip length: exactly ${input.tripDays} days, including the return journey if requested.`,
@@ -79,27 +85,47 @@ export async function generateVeloPlan(ai: AiRunner, input: { origin: City; dest
     'Traveler request (preferences only):',
     JSON.stringify(input.prompt || 'No extra preferences.'),
   ].filter(Boolean).join('\n')
-  try {
-    result = await ai.run('@cf/meta/llama-3.1-8b-instruct-fp8-fast', {
-      messages: [{ role: 'system', content: VELO_SYSTEM_PROMPT }, { role: 'user', content }],
-      response_format: { type: 'json_schema', json_schema: z.toJSONSchema(veloPlanSchema.extend({ days: veloPlanSchema.shape.days.length(input.tripDays) })) },
-      max_tokens: 3200,
-      temperature: 0.3,
-      repetition_penalty: 1.1,
-    })
-  } catch {
-    throw new Error('Velo could not reach Workers AI. Check its binding and free daily allowance, then try again.')
+  const messages = [{ role: 'system', content: VELO_SYSTEM_PROMPT }, { role: 'user', content }]
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let result: unknown
+    try {
+      result = await ai.run('@cf/meta/llama-3.1-8b-instruct-fp8-fast', {
+        messages,
+        response_format: { type: 'json_schema', json_schema: z.toJSONSchema(veloPlanSchema.extend({ days: veloPlanSchema.shape.days.length(input.tripDays) })) },
+        max_tokens: 3200,
+        temperature: attempt === 0 ? 0.3 : 0.1,
+        repetition_penalty: 1.1,
+      })
+    } catch {
+      throw new Error('Velo could not reach Workers AI. Check its binding and free daily allowance, then try again.')
+    }
+    try {
+      return validateVeloDraft(result, input, km, seaCrossing)
+    } catch (cause) {
+      if (!(cause instanceof VeloDraftError) || attempt === 1) throw cause
+      const response = (result as { response?: unknown })?.response
+      messages.push(
+        { role: 'assistant', content: ((typeof response === 'string' ? response : JSON.stringify(response)) || '{}').slice(0, 18000) },
+        { role: 'user', content: `The draft failed validation: ${cause.feedback}\nRepair the complete JSON plan using the same fixed trip facts and preferences. Keep all safety rules. Replace invalid alternatives or remove them if another practical alternative remains. Make notes recommend a route that remains in your corrected plan. Never add return travel to an outward route. Return exactly ${input.tripDays} days. Do not invent a route if none is plausible.` },
+      )
+    }
   }
+  throw new Error('Velo could not complete this plan. No trip was saved.')
+}
+
+function validateVeloDraft(result: unknown, input: VeloInput, km: number, seaCrossing: boolean) {
   const response = (result as { response?: unknown })?.response
   let parsed: z.infer<typeof veloPlanSchema>
   try {
     parsed = veloPlanSchema.extend({ days: veloPlanSchema.shape.days.length(input.tripDays) }).parse(typeof response === 'string' ? JSON.parse(response.replace(/^```(?:json)?\s*/u, '').replace(/\s*```$/u, '')) : response)
   } catch (cause) {
     console.warn('Velo output validation failed', cause instanceof z.ZodError ? cause.issues : String(cause))
-    throw new Error('Velo returned an incomplete plan. Please try again; no trip was saved.')
+    const feedback = cause instanceof z.ZodError ? cause.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; ').slice(0, 1600) : 'Return a valid JSON object, without prose or Markdown.'
+    throw new VeloDraftError('Velo returned an incomplete plan. Please try again; no trip was saved.', feedback)
   }
   const naturalText = (text: string) => text.replace(/(\d)\s*[\u2013\u2014]\s*(\d)/gu, '$1 to $2').replace(/\s*[\u2013\u2014]\s*/gu, ', ')
   if (!parsed.routes.length) throw new Error(naturalText(parsed.notes).slice(0, 800))
+  const rejected: string[] = []
   const routes = parsed.routes.map((route): RouteEstimate => ({
     title: naturalText(route.title),
     summary: naturalText(route.summary.startsWith('Estimated') ? route.summary : `Estimated: ${route.summary}`),
@@ -113,24 +139,25 @@ export async function generateVeloPlan(ai: AiRunner, input: { origin: City; dest
     sourceLabel: 'Velo AI estimate',
     sourceUrl: '',
   })).filter((route) => {
-    const reject = (reason: string) => {
+    const reject = (reason: string, correction = reason) => {
+      rejected.push(`${route.title}: ${correction}`)
       console.warn('Velo route validation rejected a draft', { reason, distanceKm: km, durationMinutes: route.durationMinutes, priceCents: route.priceCents })
       return false
     }
-    if (!matchesCityName(input.origin, route.legs[0].fromName)) return reject('origin')
-    if (!matchesCityName(input.destination, route.legs.at(-1)!.toName)) return reject('destination')
+    if (!matchesCityName(input.origin, route.legs[0].fromName)) return reject('origin', `first leg must start in ${input.origin.name}`)
+    if (!matchesCityName(input.destination, route.legs.at(-1)!.toName)) return reject('destination', `last leg must end in ${input.destination.name}`)
     const hasFlight = route.legs.some((leg) => leg.mode === 'Flight')
     const hasFerry = route.legs.some((leg) => leg.mode === 'Ferry')
-    if (hasFlight && km < 150) return reject('short-flight')
-    if (hasFlight && route.priceCents < 150000) return reject('flight-fare')
-    if (seaCrossing && !hasFlight && !hasFerry) return reject('sea-crossing')
-    if (!hasFlight && !hasFerry && km / (route.durationMinutes / 60) > 110) return reject('ground-duration')
-    if (route.priceBasis === 'perVehicle' && route.priceCents < km * 5 * 100) return reject('vehicle-fare')
-    if (route.priceBasis === 'perTraveler' && route.priceCents < km * 0.1 * 100) return reject('traveler-fare')
+    if (hasFlight && km < 150) return reject('short-flight', 'Do not use Flight for this short trip.')
+    if (hasFlight && route.priceCents < 150000) return reject('flight-fare', 'The flight route fare is implausibly low. Estimate at least INR 1500 per traveler.')
+    if (seaCrossing && !hasFlight && !hasFerry) return reject('sea-crossing', 'This route crosses the sea. Include Flight or Ferry, never a road-only route.')
+    if (!hasFlight && !hasFerry && km / (route.durationMinutes / 60) > 110) return reject('ground-duration', `Ground travel is too fast at ${route.durationMinutes} minutes. Allow at least ${Math.ceil(km / 110 * 60)} minutes and realistic transfer time.`)
+    if (route.priceBasis === 'perVehicle' && route.priceCents < km * 5 * 100) return reject('vehicle-fare', `The cab fare is too low. Estimate at least INR ${km * 5} for the vehicle, using a realistic one-way fare.`)
+    if (route.priceBasis === 'perTraveler' && route.priceCents < km * 0.1 * 100) return reject('traveler-fare', `The fare is too low. Estimate at least INR ${Math.ceil(km * 0.1)} per traveler, including transfers.`)
     return true
   })
-  if (routes.length !== parsed.routes.length) throw new Error('Velo could not produce a practical route for this request. Try changing your travel preferences.')
-  if (new Set(routes.map((route) => route.title)).size !== routes.length) throw new Error('Velo returned duplicate alternatives. Please try again.')
+  if (routes.length !== parsed.routes.length) throw new VeloDraftError('Velo could not produce a practical route after checking its draft. Please try again; no trip was saved.', rejected.join('; '))
+  if (new Set(routes.map((route) => route.title)).size !== routes.length) throw new VeloDraftError('Velo returned duplicate alternatives. Please try again.', 'Alternative titles must be unique. Return distinct useful routes, not duplicates.')
   const notes = [parsed.notes, ...parsed.days.map((day, index) => `Day ${index + 1}: ${day.activities}`)].map(naturalText).join('\n\n')
   return { notes, routes, sources: (input.context ?? []).map(({ text: _, ...source }) => source) }
 }

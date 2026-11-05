@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
 import TripMap from '../components/TripMap'
 import CitySearch from '../components/CitySearch'
@@ -26,6 +26,7 @@ function TripSearchPage() {
   const [today, setToday] = useState('')
   const [departureDate, setDepartureDate] = useState('')
   const [busy, setBusy] = useState(false)
+  const submitting = useRef(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -35,7 +36,9 @@ function TripSearchPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (submitting.current) return
     if (!origin || !destination) { setError('Select both cities from the search results.'); return }
+    submitting.current = true
     setError('')
     setBusy(true)
     const form = new FormData(event.currentTarget)
@@ -55,6 +58,7 @@ function TripSearchPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'The trip could not be saved.')
     } finally {
+      submitting.current = false
       setBusy(false)
     }
   }
@@ -86,6 +90,7 @@ function TripSearchPage() {
             </label>
             <label className={styles.compactField}><span className={styles.controlLabel}>Days away</span><input aria-label="Days away" type="number" min="1" max="14" required value={tripDays} onChange={(event) => setTripDays(Number(event.currentTarget.value))} /></label>
             <p className={styles.dataCredit}>City data: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
+            {error && <p className={app.errorNotice} role="alert">{error}</p>}
 
             <div className={styles.submitRow}>
               <details className={styles.scheduleSettings}>
@@ -116,10 +121,9 @@ function TripSearchPage() {
                 </div>
               </details>
 
-            {error && <p className={app.errorNotice} role="alert">{error}</p>}
               <button type="submit" className={app.buttonPrimary} disabled={busy || !origin || !destination} data-pending={busy || undefined}>
                 {busy && <FlowLoader />}
-                {busy ? 'Velo is planning...' : 'Plan my journey'} <span aria-hidden="true">↗</span>
+                {busy ? 'Planning trip' : 'Plan my journey'} {!busy && <span aria-hidden="true">↗</span>}
               </button>
             </div>
           </form>

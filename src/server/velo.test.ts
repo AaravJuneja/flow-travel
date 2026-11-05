@@ -57,6 +57,74 @@ describe('Velo', () => {
     await expect(generateVeloPlan(runner([roundTrip]), input)).rejects.toThrow('practical route')
   })
 
+  test('repairs a rejected first draft within the same request', async () => {
+    let calls = 0
+    let repair = ''
+    const plan = await generateVeloPlan({ run: async (_, payload) => {
+      calls++
+      repair = JSON.stringify(payload)
+      const draft = calls === 1 ? { ...route, legs: [{ ...route.legs[0], toName: 'Mumbai' }] } : route
+      return { response: { notes: 'Take a cab. Allow time for traffic.', days, routes: [draft] } }
+    } }, input)
+    expect(calls).toBe(2)
+    expect(repair).toContain('last leg must end in Pune')
+    expect(repair).toContain('same fixed trip facts and preferences')
+    expect(plan.routes[0].legs.at(-1)?.toName).toBe('Pune')
+  })
+
+  test('repairs malformed JSON without requiring another button click', async () => {
+    let calls = 0
+    const plan = await generateVeloPlan({ run: async () => {
+      calls++
+      return { response: calls === 1 ? 'Here is a plan.' : { notes: 'Take a cab.', days, routes: [route] } }
+    } }, input)
+    expect(calls).toBe(2)
+    expect(plan.routes).toHaveLength(1)
+  })
+
+  test('does not rerun a valid draft or an honest refusal', async () => {
+    let calls = 0
+    await generateVeloPlan({ run: async () => {
+      calls++
+      return { response: { notes: 'Take a cab.', days, routes: [route] } }
+    } }, input)
+    expect(calls).toBe(1)
+    calls = 0
+    await expect(generateVeloPlan({ run: async () => {
+      calls++
+      return { response: { notes: 'No plausible route meets these preferences.', days, routes: [] } }
+    } }, input)).rejects.toThrow('No plausible route')
+    expect(calls).toBe(1)
+  })
+
+  test('bounds repair attempts and never accepts an invalid repaired route', async () => {
+    let calls = 0
+    await expect(generateVeloPlan({ run: async () => {
+      calls++
+      return { response: { notes: 'Take a cab.', days, routes: [{ ...route, priceRupees: 1 }] } }
+    } }, input)).rejects.toThrow('practical route')
+    expect(calls).toBe(2)
+  })
+
+  test('does not retry provider failures or quota errors', async () => {
+    let calls = 0
+    await expect(generateVeloPlan({ run: async () => {
+      calls++
+      throw new Error('quota')
+    } }, input)).rejects.toThrow('free daily allowance')
+    expect(calls).toBe(1)
+  })
+
+  test('asks for a complete repair when just one alternative is invalid', async () => {
+    let calls = 0
+    const plan = await generateVeloPlan({ run: async () => {
+      calls++
+      return { response: { notes: 'Take the valid cab.', days, routes: calls === 1 ? [route, { ...route, title: 'Too cheap', priceRupees: 1 }] : [route] } }
+    } }, input)
+    expect(calls).toBe(2)
+    expect(plan.routes.map((item) => item.title)).toEqual(['Cab and walk'])
+  })
+
   test('searches Indian cities and aliases beyond the old catalog', () => {
     for (const name of ['Mumbai', 'Pune', 'Kochi', 'Bangalore', 'Varanasi', 'Gangtok', 'Port Blair', 'Leh']) expect(searchCities(name).length).toBeGreaterThan(0)
     expect(searchCities('London')).toEqual([])
