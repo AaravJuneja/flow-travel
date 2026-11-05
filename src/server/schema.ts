@@ -1,4 +1,5 @@
 import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import type { TripLocation } from '../lib/locations'
 
 export const users = sqliteTable(
   'users',
@@ -32,6 +33,8 @@ export const trips = sqliteTable(
     originName: text('origin_name').notNull(),
     destinationCode: text('destination_code').notNull(),
     destinationName: text('destination_name').notNull(),
+    pickupLocation: text('pickup_location', { mode: 'json' }).$type<TripLocation>(),
+    dropoffLocation: text('dropoff_location', { mode: 'json' }).$type<TripLocation>(),
     departureDate: text('departure_date').notNull(),
     departureTime: text('departure_time').notNull(),
     travelers: integer('travelers').notNull().default(1),

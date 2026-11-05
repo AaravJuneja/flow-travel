@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouter, useRou
 import { useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
 import TripMap from '../components/TripMap'
+import TripEndpoints from '../components/TripEndpoints'
 import {
   addJourneyDelay,
   completeNextLeg,
@@ -83,7 +84,7 @@ function JourneyPage() {
     <AppLayout active="home" mobileNavigation={false}>
       <div className={styles.screen}>
         <section className={styles.mapScene} aria-label="Journey map">
-          <div className={styles.mapCanvas}><TripMap destinationCode={data.trip.destinationCode} originCity={data.originCity ?? undefined} destinationCity={data.destinationCity ?? undefined} /></div>
+          <div className={styles.mapCanvas}><TripMap destinationCode={data.trip.destinationCode} originCity={data.originCity ?? undefined} destinationCity={data.destinationCity ?? undefined} pickupLocation={data.trip.pickupLocation} dropoffLocation={data.trip.dropoffLocation} /></div>
           <header className={styles.pageHeader}>
             <Link className={styles.backLink} to="/home" aria-label="Back to my trips">
               <img src="/assets/figma/journey/back-arrow.svg" alt="" />
@@ -96,6 +97,7 @@ function JourneyPage() {
         <div className={styles.journeySheet}>
           <img className={styles.sheetHandle} src="/assets/figma/journey/sheet-handle.svg" alt="" />
           <div className={styles.sheetContent}>
+            <TripEndpoints trip={data.trip} />
             <section className={`${app.panel} ${styles.nextCard}`}>
               <p className={styles.nextEyebrow}>{data.trip.status === 'completed' ? 'Destination' : 'Next stop'}</p>
               <h2>{nextStopName}</h2>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import AppLayout from '../components/AppLayout'
 import TripStatusIcon from '../components/TripStatusIcon'
 import DeleteTripButton from '../components/DeleteTripButton'
+import TripEndpoints from '../components/TripEndpoints'
 import { CalendarDays, Check, Clock3 } from 'lucide-react'
 import { createCheckoutSession, getCurrentUser, getWalletData } from '../server/functions'
 import app from '../styles/app.module.css'
@@ -116,6 +117,7 @@ function WalletPage() {
                         </span>
                       </div>
 
+                      <TripEndpoints trip={trip} />
                       {option ? (
                         <div className={styles.legList}>{(routeDetails?.legs ?? [{ mode: option.mode, fromName: trip.originName, toName: trip.destinationName, durationMinutes: option.durationMinutes }]).map((leg, index) => <div className={styles.routeEstimate} key={index}>
                           <span className={styles.transportBadge} aria-hidden="true">

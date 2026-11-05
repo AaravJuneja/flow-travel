@@ -51,6 +51,14 @@ bun run typecheck
 bun run build
 ```
 
+## Pickup and drop-off points
+
+After choosing a city, travelers can search for a nearby address or landmark, confirm a map pin, use their device location with permission, or keep a manually entered address. Entrance notes are optional. Search is debounced and cached; Photon requests are limited to nearby Indian results. Manual addresses are labeled as address-only and are not treated as verified coordinates. Pin selection preserves the chosen coordinates even when a nearby address is found.
+
+Locations are saved with the trip and included in Velo's fixed facts, route endpoints, comparison, editing, journey and wallet views. Changing a city clears its previously selected point. Points must be within 60 km of the selected city center. Existing trips without exact locations keep their city-level behavior.
+
+Address lookup uses [Photon](https://photon.komoot.io/) with OpenStreetMap attribution. Address searches and coordinates are posted to the authenticated server rather than put in application request URLs. Entrance notes are not sent to the geocoder. Device location is requested only after the traveler presses its button. Photon's public service permits reasonable project use but has no availability guarantee and may throttle requests. Search failures leave manual entry and pin selection available. Move to a dedicated Photon instance or a hosted geocoder before high-volume use. The public Nominatim API is not used for autocomplete, which its [usage policy](https://operations.osmfoundation.org/policies/nominatim/) prohibits.
+
 ## Turso and Cloudflare Workers
 
 The Worker uses `@libsql/client/web` and Drizzle over HTTP, with no local database files or native SQLite dependencies. Hosted connections require a `libsql://` or `https://` URL and an auth token. A hosted Turso database must be created separately, with approval.

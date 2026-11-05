@@ -5,6 +5,7 @@ import { CalendarDays } from 'lucide-react'
 import { chooseTripOption, getCurrentUser, getTripOptions } from '../server/functions'
 import app from '../styles/app.module.css'
 import FlowLoader from '../components/FlowLoader'
+import TripEndpoints from '../components/TripEndpoints'
 import styles from './trip-options.module.css'
 
 export const Route = createFileRoute('/trip/$tripId/options')({
@@ -63,6 +64,7 @@ function RouteOptionsPage() {
           <Link className={styles.flowMark} to="/home" aria-label="Flow home"><img src="/assets/flow-mark-header.svg" alt="" /></Link>
         </header>
 
+        <TripEndpoints trip={trip} />
         {error && <p className={app.errorNotice} role="alert">{error}</p>}
         {trip.plannerNotes && <section className={`${app.panel} ${styles.veloPlan}`} aria-labelledby="velo-plan-heading"><h2 id="velo-plan-heading">Your plan from Velo</h2><p>{trip.plannerNotes}</p>{sources.length > 0 && <details className={styles.guideSources}><summary>Sources</summary><div>{sources.map((source) => <a href={source.url} target="_blank" rel="noreferrer" key={source.url}>{source.title}{source.license ? ' (Wikivoyage contributors)' : ''}</a>)}{sources.some((source) => source.license === 'CC BY-SA 4.0') && <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">Guide-based text adapted under CC BY-SA 4.0</a>}</div></details>}</section>}
 

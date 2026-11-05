@@ -17,6 +17,7 @@ import { env as workerEnv } from 'cloudflare:workers'
 import { getDatabase } from './db'
 import { hashPassword, verifyPassword } from './passwords'
 import { deleteOwnedTrip } from './trip-management'
+import { distanceBetween, hasCoordinates, locationRadiusKm } from '../lib/locations'
 import {
   itinerarySegments,
   journeyEvents,
@@ -315,6 +316,9 @@ export async function createTrip(input: CreateTripInput) {
   const destination = findCity(input.destinationCode)
   if (!origin || !destination) throw new Error('Choose an Indian origin and destination from the city search.')
   if (origin.code === destination.code) throw new Error('Choose two different cities.')
+  for (const [label, location, city] of [['Pickup', input.pickupLocation, origin], ['Drop-off', input.dropoffLocation, destination]] as const) {
+    if (hasCoordinates(location) && distanceBetween(city, location) > locationRadiusKm) throw new Error(`${label} must be within ${locationRadiusKm} km of ${city.name}. Change the city or move the pin.`)
+  }
   const ai = (workerEnv as unknown as { AI?: AiRunner }).AI
   if (!ai) throw new Error('Connect the Workers AI binding to enable Velo. No trip was saved.')
   const db = getDatabase()
@@ -362,6 +366,8 @@ export async function createTrip(input: CreateTripInput) {
       originName,
       destinationCode: input.destinationCode,
       destinationName,
+      pickupLocation: input.pickupLocation ?? null,
+      dropoffLocation: input.dropoffLocation ?? null,
       departureDate: input.departureDate,
       departureTime: input.departureTime,
       travelers: input.travelers,

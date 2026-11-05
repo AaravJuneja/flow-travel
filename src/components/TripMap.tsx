@@ -5,8 +5,9 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 import styles from './TripMap.module.css'
 import type { City } from '../server/cities'
+import { hasCoordinates, type TripLocation } from '../lib/locations'
 
-const loadLeaflet = createClientOnlyFn(async () => {
+export const loadLeaflet = createClientOnlyFn(async () => {
   const leaflet = await import('leaflet')
   await import('leaflet-gesture-handling')
   return leaflet
@@ -25,10 +26,10 @@ function markerButton(className: string, label: string) {
   return button
 }
 
-export default function TripMap({ destinationCode, originCity, destinationCity }: { destinationCode?: string; originCity?: City; destinationCity?: City }) {
-  const pickup: LatLngTuple = originCity ? [originCity.latitude, originCity.longitude] : defaultPickup
-  const pickupName = originCity?.name ?? (destinationCode ? 'Sector 65, Gurugram' : 'India')
-  const destination = destinationCity ? { name: destinationCity.name, coordinates: [destinationCity.latitude, destinationCity.longitude] as LatLngTuple } : destinationCode ? destinations[destinationCode] : undefined
+export default function TripMap({ destinationCode, originCity, destinationCity, pickupLocation, dropoffLocation }: { destinationCode?: string; originCity?: City; destinationCity?: City; pickupLocation?: TripLocation | null; dropoffLocation?: TripLocation | null }) {
+  const pickup: LatLngTuple = hasCoordinates(pickupLocation) ? [pickupLocation.latitude, pickupLocation.longitude] : originCity ? [originCity.latitude, originCity.longitude] : defaultPickup
+  const pickupName = (hasCoordinates(pickupLocation) ? pickupLocation.label : originCity?.name) ?? (destinationCode ? 'Sector 65, Gurugram' : 'India')
+  const destination = destinationCity ? { name: hasCoordinates(dropoffLocation) ? dropoffLocation.label : destinationCity.name, coordinates: hasCoordinates(dropoffLocation) ? [dropoffLocation.latitude, dropoffLocation.longitude] as LatLngTuple : [destinationCity.latitude, destinationCity.longitude] as LatLngTuple } : destinationCode ? destinations[destinationCode] : undefined
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap | null>(null)
   const destinationMarker = useRef<Marker | null>(null)
@@ -52,7 +53,7 @@ export default function TripMap({ destinationCode, originCity, destinationCity }
       if (disposed || !container.current) return
       const options: MapOptions & { gestureHandling: boolean } = {
         center: originCity || destinationCode ? pickup : [22.5, 79],
-        zoom: originCity || destinationCode ? 12 : 5,
+        zoom: hasCoordinates(pickupLocation) ? 15 : originCity || destinationCode ? 12 : 5,
         minZoom: 3,
         maxZoom: 19,
         zoomControl: false,
@@ -84,7 +85,9 @@ export default function TripMap({ destinationCode, originCity, destinationCity }
         iconSize: [23, 23],
         iconAnchor: [11.5, 11.5],
       })
-      if (originCity || destinationCode) leaflet.marker(pickup, { icon, keyboard: false }).bindPopup(`Pickup: ${pickupName}`).addTo(map)
+      const popup = document.createElement('span')
+      popup.textContent = `Pickup: ${pickupName}`
+      if (originCity || destinationCode) leaflet.marker(pickup, { icon, keyboard: false }).bindPopup(popup).addTo(map)
       observer = new ResizeObserver(() => map?.invalidateSize({ pan: false }))
       observer.observe(container.current)
     }).catch(() => { if (!disposed) setFailed(true) })
@@ -97,7 +100,7 @@ export default function TripMap({ destinationCode, originCity, destinationCity }
       mapRef.current = null
       map?.remove()
     }
-  }, [attempt, originCity?.code, destinationCode])
+  }, [attempt, originCity?.code, destinationCode, pickupLocation?.latitude, pickupLocation?.longitude, pickupLocation?.label])
 
   useEffect(() => {
     const map = mapRef.current
@@ -115,7 +118,9 @@ export default function TripMap({ destinationCode, originCity, destinationCity }
           iconSize: [23, 23],
           iconAnchor: [11.5, 11.5],
         })
-        destinationMarker.current = leaflet.marker(destination.coordinates, { icon, keyboard: false }).bindPopup(destination.name).addTo(map)
+        const popup = document.createElement('span')
+        popup.textContent = destination.name
+        destinationMarker.current = leaflet.marker(destination.coordinates, { icon, keyboard: false }).bindPopup(popup).addTo(map)
         map.fitBounds(leaflet.latLngBounds([pickup, destination.coordinates]), {
           paddingTopLeft: [45, 65],
           paddingBottomRight: [45, 90],
@@ -124,10 +129,10 @@ export default function TripMap({ destinationCode, originCity, destinationCity }
         })
       })
     } else {
-      map.setView(originCity || destinationCode ? pickup : [22.5, 79], originCity || destinationCode ? 12 : 5, { animate: !reducedMotion })
+      map.setView(originCity || destinationCode ? pickup : [22.5, 79], hasCoordinates(pickupLocation) ? 15 : originCity || destinationCode ? 12 : 5, { animate: !reducedMotion })
     }
     return () => { disposed = true }
-  }, [destinationCode, destinationCity?.code, originCity?.code, overview, ready])
+  }, [destinationCode, destinationCity?.code, originCity?.code, overview, ready, pickupLocation?.latitude, pickupLocation?.longitude, pickupLocation?.label, dropoffLocation?.latitude, dropoffLocation?.longitude, dropoffLocation?.label])
 
   return (
     <div className={styles.map} role="region" aria-label="Interactive journey map">
@@ -135,7 +140,7 @@ export default function TripMap({ destinationCode, originCity, destinationCity }
       {!ready && !failed && <p className={styles.loading} role="status">Loading map</p>}
       {ready && <div className={styles.mapTools}>
         <button type="button" onClick={() => setOverview(false)} aria-pressed={!overview}>Pickup area</button>
-        {destination && originCity && <button type="button" onClick={() => setOverview(true)} aria-pressed={overview}>Show cities</button>}
+        {destination && originCity && <button type="button" onClick={() => setOverview(true)} aria-pressed={overview}>{pickupLocation || dropoffLocation ? 'Show endpoints' : 'Show cities'}</button>}
       </div>}
       {failed && <div className={styles.mapError} role="status"><p>The map couldn’t load.</p><button type="button" onClick={() => setAttempt(attempt + 1)}>Retry map</button></div>}
       <p className={styles.mapCaption}>{overview && destination ? `${pickupName} to ${destination.name}` : pickupName}</p>

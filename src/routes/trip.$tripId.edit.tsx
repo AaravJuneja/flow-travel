@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect, useRouter } from '@tanstack/react-rout
 import { useEffect, useState, type FormEvent } from 'react'
 import AppLayout from '../components/AppLayout'
 import DeleteTripButton from '../components/DeleteTripButton'
+import TripEndpoints from '../components/TripEndpoints'
 import { chooseTripOption, getCurrentUser, getTripDetails, updateTripPlan } from '../server/functions'
 import app from '../styles/app.module.css'
 import FlowLoader from '../components/FlowLoader'
@@ -97,6 +98,7 @@ function EditTripPage() {
             <Link className={styles.flowMark} to="/home" aria-label="Flow home"><img src="/assets/flow-mark-header.svg" alt="" /></Link>
           </header>
 
+          <TripEndpoints trip={data.trip} />
           <section className={`${app.panel} ${styles.routeSummary}`} aria-label="Selected route">
             <span className={styles.routeModeBadge} aria-hidden="true">
               <img className={styles.routeModeIcon} src={getModeIcon(option.mode)} alt="" />

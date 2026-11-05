@@ -27,6 +27,16 @@ async function fixture() {
 }
 
 describe('trip deletion', () => {
+  test('keeps older trips compatible and persists precise locations as JSON', async () => {
+    const db = await fixture()
+    const [oldTrip] = await db.select().from(schema.trips)
+    expect(oldTrip.pickupLocation).toBeNull()
+    expect(oldTrip.dropoffLocation).toBeNull()
+    const point = { label: 'Gate 2', latitude: 28.45, longitude: 77.07, source: 'pin' as const, details: 'Main road' }
+    await db.update(schema.trips).set({ pickupLocation: point })
+    expect((await db.select().from(schema.trips))[0].pickupLocation).toEqual(point)
+  })
+
   test('removes only the owned trip and its related records', async () => {
     const db = await fixture()
     await expect(deleteOwnedTrip(db, 'owner', 'delete-me')).resolves.toEqual({ deleted: true })

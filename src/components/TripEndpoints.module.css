@@ -1,0 +1,7 @@
+.endpoints { display: grid; gap: 14px; margin: 18px 0; padding: 18px; border: 1px solid #ffffffb3; border-radius: 20px; background: #ffffff70; }
+.endpoints > div { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+.endpoints svg { flex: none; margin-top: 2px; color: #a05e4e; }
+.endpoints dt { margin-bottom: 4px; font-size: .73rem; color: #747474; }
+.endpoints dd { margin: 0; font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.endpoints a { text-decoration-color: #b9b1a7; text-underline-offset: 3px; }
+.endpoints span, .endpoints small { display: block; margin-top: 3px; font-size: .76rem; color: #747474; }

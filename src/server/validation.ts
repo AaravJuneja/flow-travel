@@ -21,9 +21,20 @@ export const signInSchema = z.object({
 export const setPasswordSchema = z.object({ password })
 export const updateProfileSchema = z.object({ name: z.string().trim().min(1, 'Enter your name.').max(80) })
 
+export const tripLocationSchema = z.object({
+  label: z.string().trim().min(1).max(180),
+  latitude: z.number().finite().min(-90).max(90).optional(),
+  longitude: z.number().finite().min(-180).max(180).optional(),
+  details: z.string().trim().max(160).optional(),
+  source: z.enum(['search', 'pin', 'device', 'manual']),
+}).refine((value) => (value.latitude === undefined) === (value.longitude === undefined), 'Both map coordinates are required.')
+  .refine((value) => value.source === 'manual' || value.latitude !== undefined, 'Choose a point on the map.')
+
 export const createTripSchema = z.object({
   originCode: z.string().regex(/^(IN-\d+|[A-Z]{3})$/),
   destinationCode: z.string().regex(/^(IN-\d+|[A-Z]{3})$/),
+  pickupLocation: tripLocationSchema.nullish(),
+  dropoffLocation: tripLocationSchema.nullish(),
   prompt: z.string().trim().max(2000).default(''),
   tripDays: z.number().int().min(1).max(14).default(2),
   departureDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

@@ -8,6 +8,8 @@ import type { City } from '../server/cities'
 import styles from './trip-search.module.css'
 import app from '../styles/app.module.css'
 import FlowLoader from '../components/FlowLoader'
+import TripLocationField from '../components/TripLocationField'
+import type { TripLocation } from '../lib/locations'
 
 export const Route = createFileRoute('/trip/search')({
   beforeLoad: async () => {
@@ -21,6 +23,8 @@ function TripSearchPage() {
   const navigate = useNavigate()
   const [origin, setOrigin] = useState<City | null>(null)
   const [destination, setDestination] = useState<City | null>(null)
+  const [pickupLocation, setPickupLocation] = useState<TripLocation | null>(null)
+  const [dropoffLocation, setDropoffLocation] = useState<TripLocation | null>(null)
   const [prompt, setPrompt] = useState('')
   const [tripDays, setTripDays] = useState(2)
   const [today, setToday] = useState('')
@@ -47,6 +51,8 @@ function TripSearchPage() {
         data: {
           originCode: origin.code,
           destinationCode: destination.code,
+          pickupLocation,
+          dropoffLocation,
           prompt,
           tripDays,
           departureDate: String(form.get('departureDate') ?? ''),
@@ -69,7 +75,7 @@ function TripSearchPage() {
         <div className={styles.destinationScreen}>
           <section className={styles.mapHero} aria-label="Journey map">
             <div className={styles.mapCanvas}>
-              <TripMap originCity={origin ?? undefined} destinationCity={destination ?? undefined} />
+              <TripMap originCity={origin ?? undefined} destinationCity={destination ?? undefined} pickupLocation={pickupLocation} dropoffLocation={dropoffLocation} />
             </div>
           </section>
 
@@ -82,8 +88,10 @@ function TripSearchPage() {
               <p>Pick your cities. Tell Velo what matters to you.</p>
             </header>
 
-            <CitySearch label="Leaving from" value={origin} onChange={setOrigin} />
-            <CitySearch label="Going to" value={destination} onChange={setDestination} />
+            <CitySearch label="Leaving from" value={origin} onChange={(city) => { setOrigin(city); setPickupLocation(null) }} />
+            {origin && <TripLocationField key={`pickup-${origin.code}`} kind="pickup" city={origin} value={pickupLocation} onChange={setPickupLocation} />}
+            <CitySearch label="Going to" value={destination} onChange={(city) => { setDestination(city); setDropoffLocation(null) }} />
+            {destination && <TripLocationField key={`dropoff-${destination.code}`} kind="drop-off" city={destination} value={dropoffLocation} onChange={setDropoffLocation} />}
             <label className={styles.promptField}>
               <span><img src="/assets/home-sparkle.svg" width="22" height="22" alt="" /> Plan with Velo</span>
               <textarea value={prompt} onChange={(event) => setPrompt(event.currentTarget.value)} maxLength={2000} rows={4} placeholder="A relaxed 3-day trip under ₹8,000 each. Prefer trains, local food and places that aren't too crowded." />

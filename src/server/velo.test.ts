@@ -125,6 +125,24 @@ describe('Velo', () => {
     expect(plan.routes.map((item) => item.title)).toEqual(['Cab and walk'])
   })
 
+  test('includes confirmed pickup and drop-off facts and enforces both route endpoints', async () => {
+    const pickupLocation = { label: 'Gate 2', latitude: origin.latitude, longitude: origin.longitude, details: 'Meet beside the main road', source: 'pin' as const }
+    const dropoffLocation = { label: 'North entrance hotel', source: 'manual' as const }
+    const preciseRoute = { ...route, legs: [{ ...route.legs[0], fromName: 'Gate 2, Mumbai' }, { ...route.legs[1], toName: 'North entrance hotel, Pune' }] }
+    let request = ''
+    const plan = await generateVeloPlan({ run: async (_, payload) => {
+      request = JSON.stringify(payload)
+      return { response: { notes: 'Travel to the chosen hotel.', days, routes: [preciseRoute] } }
+    } }, { ...input, pickupLocation, dropoffLocation })
+    expect(request).toContain('Gate 2')
+    expect(request).toContain('Meet beside the main road')
+    expect(request).toContain('manual')
+    expect(plan.routes[0].legs[0].fromName).toBe('Gate 2, Mumbai')
+    expect(plan.routes[0].legs.at(-1)?.toName).toBe('North entrance hotel, Pune')
+    await expect(generateVeloPlan(runner([route]), { ...input, pickupLocation })).rejects.toThrow('practical route')
+    await expect(generateVeloPlan(runner([route]), { ...input, dropoffLocation })).rejects.toThrow('practical route')
+  })
+
   test('searches Indian cities and aliases beyond the old catalog', () => {
     for (const name of ['Mumbai', 'Pune', 'Kochi', 'Bangalore', 'Varanasi', 'Gangtok', 'Port Blair', 'Leh']) expect(searchCities(name).length).toBeGreaterThan(0)
     expect(searchCities('London')).toEqual([])

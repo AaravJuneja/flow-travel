@@ -78,6 +78,30 @@ export const getCityPhoto = createServerFn({ method: 'GET' })
     return cityPhoto(data.code)
   })
 
+export const searchNearbyPlaces = createServerFn({ method: 'POST' })
+  .validator(z.object({ cityCode: z.string().regex(/^(IN-\d+|[A-Z]{3})$/), query: z.string().trim().min(3).max(180) }))
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    if (!(await service.getCurrentUser())) throw new Error('Sign in to search for an address.')
+    const { findCity } = await import('./cities')
+    const city = findCity(data.cityCode)
+    if (!city) throw new Error('Choose a city first.')
+    const { searchPlaces } = await import('./places')
+    return searchPlaces(city, data.query)
+  })
+
+export const describeNearbyPlace = createServerFn({ method: 'POST' })
+  .validator(z.object({ cityCode: z.string().regex(/^(IN-\d+|[A-Z]{3})$/), latitude: z.number().finite().min(-90).max(90), longitude: z.number().finite().min(-180).max(180) }))
+  .handler(async ({ data }) => {
+    const service = await import('./services')
+    if (!(await service.getCurrentUser())) throw new Error('Sign in to choose a location.')
+    const { findCity } = await import('./cities')
+    const city = findCity(data.cityCode)
+    if (!city) throw new Error('Choose a city first.')
+    const { describePlace } = await import('./places')
+    return describePlace(city, data)
+  })
+
 export const createTrip = createServerFn({ method: 'POST' })
   .validator(createTripSchema)
   .handler(async ({ data }) => {
